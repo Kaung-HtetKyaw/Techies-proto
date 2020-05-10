@@ -6,13 +6,19 @@
           <v-card>
             <v-card-title class="primary lighten-1 white--text text-center">Login</v-card-title>
             <v-card-text class="mt-6">
-              <v-form ref="form" class="px-2" v-model="valid" lazy-validation>
-                <v-text-field outlined v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
+              <v-form ref="form" class="px-2" v-model="valid" @submit="login">
+                <v-text-field
+                  outlined
+                  v-model="user.email"
+                  :rules="emailRules"
+                  label="E-mail"
+                  required
+                ></v-text-field>
                 <v-text-field
                   type="password"
-                  v-model="password"
-                  :counter="10"
-                  :rules="nameRules"
+                  v-model="user.password"
+                  :counter="20"
+                  :rules="passwordRules"
                   label="Password"
                   outlined
                   required
@@ -25,7 +31,7 @@
                     :disabled="!valid"
                     color="info"
                     class="mr-4"
-                    @click="validate"
+                    @click="login"
                     rounded
                   >Validate</v-btn>
                 </div>
@@ -40,30 +46,43 @@
 
 <script>
 import { rules } from "@/mixins/rules.js";
+import store from "@/store/index.js";
 export default {
   mixins: [rules],
   data: () => ({
     valid: true,
-    password: "",
 
-    email: "",
+    user: {
+      password: "",
+      email: ""
+    },
 
-    select: null,
-    items: ["Item 1", "Item 2", "Item 3", "Item 4"],
-    checkbox: false,
     loading: false
   }),
 
   methods: {
-    validate() {
-      this.loading = true;
+    login() {
+      const login_user = {
+        email: this.user.email,
+        password: this.user.password
+      };
       this.$refs.form.validate();
-    },
-    reset() {
-      this.$refs.form.reset();
-    },
-    resetValidation() {
-      this.$refs.form.resetValidation();
+      if (this.valid) {
+        this.loading = true;
+        console.log(login_user);
+        store
+          .dispatch("user/signIn", login_user)
+          .then(() => {
+            this.loading = false;
+            this.$router.push({ name: "postsfeed" });
+          })
+          .catch(error => {
+            this.loading = false;
+            console.log(error);
+          });
+      } else {
+        this.loading = false;
+      }
     }
   }
 };

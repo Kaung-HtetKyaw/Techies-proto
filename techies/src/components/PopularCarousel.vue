@@ -7,7 +7,7 @@
         <v-container>
           <v-row dense class="d-flex justify-center align-center carousel-height">
             <v-col cols="12" sm="2" class="d-flex justify-center align-center">
-              <h2 class="display-3 post-no font-weight-bold">{{i+1}}</h2>
+              <h2 class="post-no font-weight-bold">{{i+1}}</h2>
             </v-col>
             <v-col cols="12" sm="10">
               <h2 class="headline font-weight-bold my-2 opacity-7">{{post.title}}</h2>
@@ -85,7 +85,8 @@ export default {
   height: 200px;
 }
 .post-no {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: serif;
+  font-size: 90px;
 
   opacity: 0.5;
 }

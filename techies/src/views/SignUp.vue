@@ -6,19 +6,35 @@
           <v-card>
             <v-card-title class="primary lighten-1 white--text text-center">Sign Up</v-card-title>
             <v-card-text class="mt-6">
-              <v-form ref="form" class="px-2" v-model="valid" lazy-validation>
+              <v-form ref="form" class="px-2" v-model="valid">
                 <v-text-field outlined v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
+                <v-text-field
+                  type="text"
+                  v-model="displayName"
+                  :counter="10"
+                  :rules="nameRules"
+                  label="Name"
+                  outlined
+                  required
+                ></v-text-field>
                 <v-text-field
                   type="password"
                   v-model="password"
                   :counter="10"
-                  :rules="nameRules"
+                  :rules="passwordRules"
                   label="Password"
                   outlined
                   required
                 ></v-text-field>
                 <div class="mb-6">
-                  <v-btn outlined color="info" rounded required @click="onPickFile">Choose a file</v-btn>
+                  <v-btn
+                    v-if="!imageUrl"
+                    outlined
+                    color="info"
+                    rounded
+                    required
+                    @click="onPickFile"
+                  >Choose a file</v-btn>
                   <input
                     type="file"
                     class="d-none"
@@ -27,26 +43,34 @@
                     @change="onFilePicked"
                   />
                   <v-img v-if="local_imageUrl" :src="local_imageUrl" width="150px" class="my-4"></v-img>
+                  <div class="my-4" v-if="upload_btn">
+                    <v-btn
+                      outlined
+                      small
+                      color="success"
+                      :loading="upload"
+                      rounded
+                      required
+                      @click="uploadFile"
+                    >
+                      Upload
+                      <v-icon right dark>mdi-cloud-upload</v-icon>
+                    </v-btn>
+                  </div>
+                  <div class="my-4" v-if="upload_finish">
+                    <v-alert dense text type="success" dismissible>Upload Finished</v-alert>
+                  </div>
                 </div>
 
-                <v-select
-                  v-model="select"
-                  :items="items"
-                  :rules="selectRules"
-                  label="Item"
-                  required
-                  outlined
-                ></v-select>
-
-                <v-checkbox
-                  outlined
-                  v-model="checkbox"
-                  :rules="checkRules"
-                  label="Do you agree?"
-                  required
-                ></v-checkbox>
                 <div class="d-flex justify-end">
-                  <v-btn outlined :disabled="!valid" color="info" @click="validate" rounded>Validate</v-btn>
+                  <v-btn
+                    outlined
+                    :loading="loading"
+                    :disabled="!valid"
+                    color="info"
+                    @click="validate"
+                    rounded
+                  >Validate</v-btn>
                 </div>
               </v-form>
             </v-card-text>
@@ -59,6 +83,11 @@
 
 <script>
 import { rules } from "@/mixins/rules.js";
+import firebase from "firebase/app";
+import "firebase/firestore";
+import "firebase/storage";
+import store from "@/store/index.js";
+
 export default {
   mixins: [rules],
   data: () => ({
@@ -66,25 +95,42 @@ export default {
     password: "",
 
     email: "",
+    displayName: "",
 
-    select: null,
-    items: ["Item 1", "Item 2", "Item 3", "Item 4"],
-    checkbox: false,
     rawFile: null,
     local_imageUrl: null,
-    imageUrl: null
+    imageUrl: null,
+    upload_btn: false,
+    upload: false,
+    upload_finish: false,
+    loading: false
   }),
 
   methods: {
     validate() {
       this.$refs.form.validate();
+      const user = {
+        email: this.email,
+        displayName: this.displayName,
+        password: this.password,
+        photoURL: this.imageUrl
+      };
+
+      if (this.valid) {
+        this.loading = true;
+        store
+          .dispatch("user/signUp", user)
+          .then(res => {
+            this.loading = false;
+            console.log("view", res);
+          })
+          .catch(error => {
+            this.loading = false;
+            console.log(error);
+          });
+      }
     },
-    reset() {
-      this.$refs.form.reset();
-    },
-    resetValidation() {
-      this.$refs.form.resetValidation();
-    },
+
     onPickFile() {
       this.$refs.fileInput.click();
     },
@@ -95,13 +141,42 @@ export default {
         let filename = file.name;
         if (filename.lastIndexOf(".") <= 0) {
           return alert("Shit");
+        } else {
+          const fileReader = new FileReader();
+          fileReader.addEventListener("load", () => {
+            this.local_imageUrl = fileReader.result;
+          });
+          fileReader.readAsDataURL(file);
+          this.upload_btn = true;
         }
-        const fileReader = new FileReader();
-        fileReader.addEventListener("load", () => {
-          this.local_imageUrl = fileReader.result;
-        });
-        fileReader.readAsDataURL(file);
       }
+    },
+    uploadFile() {
+      const filename = this.rawFile;
+      this.upload = true;
+      const key = Math.floor(Math.random() * 199054289);
+      const ext = filename.name.slice(filename.name.lastIndexOf("."));
+
+      const storageRef = firebase
+        .storage()
+        .ref("posts/" + key + ext)
+        .put(filename);
+
+      storageRef.on(
+        "state_changed",
+        function() {},
+        function() {
+          // Handle unsuccessful uploads
+        },
+        () => {
+          storageRef.snapshot.ref.getDownloadURL().then(downloadURL => {
+            this.imageUrl = downloadURL;
+            this.upload = false;
+            this.upload_btn = false;
+            this.upload_finish = true;
+          });
+        }
+      );
     }
   }
 };

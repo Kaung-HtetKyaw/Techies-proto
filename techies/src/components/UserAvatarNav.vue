@@ -1,16 +1,23 @@
 <template>
   <div>
-    <v-list-item>
-      <v-avatar>
-        <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John" />
+    <v-list-item class="d-flex justify-center align-center">
+      <v-avatar size="40">
+        <img :src="user.photoURL" :alt="user.displayName" />
       </v-avatar>
-      <v-list-item-title class="ml-4 body-1">Steve Wozniak</v-list-item-title>
+      <v-list-item-title class="ml-4 body-1">{{user.displayName}}</v-list-item-title>
     </v-list-item>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  props: {
+    user: {
+      type: Object,
+      required: true
+    }
+  }
+};
 </script>
 
 <style>

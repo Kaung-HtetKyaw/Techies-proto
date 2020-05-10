@@ -6,7 +6,7 @@
       <v-toolbar-title>Techies</v-toolbar-title>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer" absolute temporary>
+    <v-navigation-drawer app v-model="drawer" fixed temporary>
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title class="title">Techies</v-list-item-title>
@@ -14,8 +14,11 @@
         </v-list-item-content>
       </v-list-item>
       <v-divider class="my-2"></v-divider>
-      <UserInfo />
-      <v-divider class="my-2"></v-divider>
+      <div v-if="!!user">
+        <UserInfo :user="user" />
+        <v-divider class="my-2"></v-divider>
+      </div>
+
       <v-list nav dense>
         <v-list-item-group active-class="primary--text text--accent-4">
           <!-- Persistent menu -->
@@ -27,23 +30,44 @@
               <v-list-item-title>Posts feed</v-list-item-title>
             </v-list-item>
           </router-link>
+          <!-- Logged in menu -->
+          <template v-if="!!user">
+            <router-link :to="{name:'create',params:{id:1}}" class="router-link">
+              <v-list-item>
+                <v-list-item-icon>
+                  <v-icon>mdi-credit-card-check-outline</v-icon>
+                </v-list-item-icon>
+                <v-list-item-title>Create Post</v-list-item-title>
+              </v-list-item>
+            </router-link>
+            <router-link :to="{name:'user',params:{id:1}}" class="router-link">
+              <v-list-item>
+                <v-list-item-icon>
+                  <v-icon>mdi-card-text-outline</v-icon>
+                </v-list-item-icon>
+                <v-list-item-title>My Posts</v-list-item-title>
+              </v-list-item>
+            </router-link>
+          </template>
 
           <!-- Logged out menu -->
-          <router-link
-            v-for="list in log_out_lists"
-            :key="list.name"
-            :to="{name:list.link}"
-            class="router-link"
-          >
-            <v-list-item>
-              <v-list-item-icon>
-                <v-icon>{{list.icon}}</v-icon>
-              </v-list-item-icon>
-              <v-list-item-title>{{list.name}}</v-list-item-title>
-            </v-list-item>
-          </router-link>
+          <template v-if="!user">
+            <router-link
+              v-for="list in log_out_lists"
+              :key="list.name"
+              :to="{name:list.link}"
+              class="router-link"
+            >
+              <v-list-item>
+                <v-list-item-icon>
+                  <v-icon>{{list.icon}}</v-icon>
+                </v-list-item-icon>
+                <v-list-item-title>{{list.name}}</v-list-item-title>
+              </v-list-item>
+            </router-link>
+          </template>
 
-          <SignOut />
+          <SignOut v-if="!!user" />
         </v-list-item-group>
         <!-- Sign Out -->
       </v-list>
@@ -54,6 +78,7 @@
 <script>
 import UserInfo from "@/components/UserAvatarNav.vue";
 import SignOut from "@/components/Signout.vue";
+import { mapState } from "vuex";
 export default {
   components: {
     UserInfo,
@@ -73,6 +98,11 @@ export default {
         icon: "mdi-account-multiple-check-outline"
       }
     ]
-  })
+  }),
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    })
+  }
 };
 </script>

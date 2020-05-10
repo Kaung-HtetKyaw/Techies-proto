@@ -4,7 +4,7 @@
       <TheNav />
     </nav>
 
-    <v-content class="my-6">
+    <v-content>
       <router-view></router-view>
     </v-content>
     <footer>
