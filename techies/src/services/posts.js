@@ -27,31 +27,18 @@ export default {
       .doc(id)
       .get();
   },
-
-  uploadImage(imageData) {
-    const key = Math.floor(Math.random() * 199054289);
-    const ext = imageData.name.slice(imageData.name.lastIndexOf("."));
-    let url;
-    const storageRef = firebase
-      .storage()
-      .ref("posts/" + key + ext)
-      .put(imageData);
-
-    storageRef.on(
-      "state_changed",
-      function() {},
-      function() {
-        // Handle unsuccessful uploads
-      },
-      () => {
-        storageRef.snapshot.ref.getDownloadURL().then((downloadURL) => {
-          console.log("File available at", downloadURL);
-          url = downloadURL;
-          return downloadURL;
-        });
-        console.log("serv url", url);
-      }
-    );
-    return url;
+  fetchUserPosts(uid) {
+    console.log("uid", uid);
+    return firebase
+      .firestore()
+      .collection("posts")
+      .where("uid", "==", uid)
+      .get();
+  },
+  createPost(post) {
+    return firebase
+      .firestore()
+      .collection("posts")
+      .add(post);
   },
 };

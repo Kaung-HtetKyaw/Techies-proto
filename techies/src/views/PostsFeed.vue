@@ -64,9 +64,8 @@ export default {
               this.loading = true;
               store
                 .dispatch("posts/fetchMorePosts")
-                .then(response => {
+                .then(() => {
                   this.loading = false;
-                  console.log(response);
                 })
                 .catch(() => {
                   this.loading = false;

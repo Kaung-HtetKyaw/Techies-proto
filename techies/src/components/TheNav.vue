@@ -38,7 +38,7 @@
                 <v-list-item-title>Create Post</v-list-item-title>
               </v-list-item>
             </router-link>
-            <router-link :to="{name:'user',params:{id:1}}" class="router-link">
+            <router-link :to="{name:'user',params:{id:user.uid}}" class="router-link">
               <v-list-item>
                 <v-list-item-icon>
                   <v-icon>mdi-card-text-outline</v-icon>

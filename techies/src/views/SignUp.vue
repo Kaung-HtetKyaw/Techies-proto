@@ -6,7 +6,7 @@
           <v-card>
             <v-card-title class="primary lighten-1 white--text text-center">Sign Up</v-card-title>
             <v-card-text class="mt-6">
-              <v-form ref="form" class="px-2" v-model="valid">
+              <v-form ref="form" class="px-2" v-model="valid" @submit="validate" @enter="validate">
                 <v-text-field outlined v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
                 <v-text-field
                   type="text"
@@ -157,7 +157,7 @@ export default {
 
       const storageRef = firebase
         .storage()
-        .ref("posts/" + key + ext)
+        .ref("users/" + key + ext)
         .put(filename);
 
       storageRef.on(

@@ -6,7 +6,7 @@
           <v-card>
             <v-card-title class="primary lighten-1 white--text text-center">Login</v-card-title>
             <v-card-text class="mt-6">
-              <v-form ref="form" class="px-2" v-model="valid" @submit="login">
+              <v-form ref="form" class="px-2" v-model="valid" @enter="login" @submit="login">
                 <v-text-field
                   outlined
                   v-model="user.email"

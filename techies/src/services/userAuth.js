@@ -13,10 +13,24 @@ export default {
       .auth()
       .createUserWithEmailAndPassword(user.email, user.password);
   },
+  addUserInfo(user) {
+    return firebase
+      .firestore()
+      .collection("users")
+      .doc(user.uid)
+      .set(user);
+  },
   signOut() {
     return firebase.auth().signOut();
   },
   currentUser() {
     return firebase.auth().currentUser;
+  },
+  fetchUser(id) {
+    return firebase
+      .firestore()
+      .collection("users")
+      .doc(id)
+      .get();
   },
 };

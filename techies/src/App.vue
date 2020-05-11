@@ -39,7 +39,9 @@ export default {
         .dispatch("user/checkInitialUser", {
           email: currentUser.email,
           displayName: currentUser.displayName,
-          photoURL: currentUser.photoURL
+          photoURL: currentUser.photoURL,
+          uid: currentUser.uid,
+          joined: currentUser.metadata.creationTime
         })
         .then(() => {
           this.$router.push({ name: "postsfeed" });

@@ -63,7 +63,18 @@ const routes = [
     path: "/u/:id",
     name: "user",
     component: User,
+    props: true,
     meta: { requiresAuth: true },
+    beforeEnter(to, from, next) {
+      store.dispatch("user/fetchUser", to.params.id).then((user) => {
+        store.dispatch("posts/fetchUserPosts", user.uid).then((res) => {
+          console.log("res", res);
+          to.params.author = user;
+          to.params.posts = res.posts;
+          next();
+        });
+      });
+    },
   },
 ];
 
@@ -73,17 +84,15 @@ const router = new VueRouter({
   routes,
 });
 router.beforeEach((to, from, next) => {
+  NProgress.start();
   const requiresAuth = to.matched.some((el) => el.meta.requiresAuth);
   const currentUser = store.state.user.user;
-  console.log("beforeeach");
+
   if (requiresAuth && !currentUser) {
-    console.log("login", currentUser);
     next({ name: "login" });
-    console.log("login");
   } else {
     console.log("next", currentUser);
     next();
-    console.log("next");
   }
 });
 

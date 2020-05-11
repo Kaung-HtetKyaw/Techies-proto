@@ -1,5 +1,5 @@
 <template>
-  <div class="my-12">
+  <div class="my-6">
     <v-container>
       <v-row dense>
         <v-col cols="12" sm="12" md="8" offset-md="2">

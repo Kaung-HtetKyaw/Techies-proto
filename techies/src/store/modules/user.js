@@ -5,10 +5,14 @@ export const state = {
   user: null,
   photoURL: null,
   log_in: false,
+  author: {},
 };
 export const mutations = {
   CHECK_INITIAL_USER_STATE(state, user) {
     state.user = user;
+  },
+  FETCH_USER(state, user) {
+    state.author = user;
   },
   LOG_IN(state, user) {
     state.user = user;
@@ -28,7 +32,25 @@ export const mutations = {
 };
 export const actions = {
   checkInitialUser({ commit }, user) {
-    commit("CHECK_INITIAL_USER_STATE", user);
+    return userServices.fetchUser(user.uid).then((res) => {
+      const commit_user = {
+        uid: res.id,
+        ...res.data(),
+      };
+      console.log("user check", commit_user);
+      commit("CHECK_INITIAL_USER_STATE", commit_user);
+    });
+  },
+  fetchUser({ commit }, id) {
+    return userServices.fetchUser(id).then((res) => {
+      const commit_user = {
+        uid: res.id,
+        ...res.data(),
+      };
+      console.log("user fetch", commit_user);
+      commit("FETCH_USER", commit_user);
+      return commit_user;
+    });
   },
   signIn({ commit }, user) {
     return userServices
@@ -40,6 +62,7 @@ export const actions = {
           displayName: response.user.displayName,
           uid: response.user.uid,
           photoURL: response.user.photoURL,
+          joined: response.user.metadata.creationTime,
         };
         //*commit it
         commit("LOG_IN", db_user);
@@ -50,27 +73,21 @@ export const actions = {
   },
   signUp({ commit }, user) {
     //* format user obj to commit obj for excluding password
-    const commit_user = {
-      displayName: user.displayName,
-      email: user.email,
-      photoURL: user.photoURL,
-    };
+    let commit_user;
     //* reach out to sign up service
-    return userServices.signUp(user).then(() => {
-      //*get current sign in user
-      const curUser = userServices.currentUser();
-      //!update later (link the authentication to database for more user info)
-      curUser
-        .updateProfile({
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-        })
-        .then((res) => {
-          console.log("res", res);
-          console.log("cur", userServices.currentUser());
-        });
-      //*commit the user
-      commit("SIGN_UP", commit_user);
+    return userServices.signUp(user).then((res) => {
+      console.log("res", res);
+      commit_user = {
+        displayName: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+        uid: res.user.uid, //*get uid from response from firebase
+        joined: res.user.metadata.creationTime, //*get joined date
+      };
+      userServices.addUserInfo(commit_user).then((response) => {
+        console.log("added user", response);
+        commit("SIGN_UP", commit_user);
+      });
       return commit_user;
     });
   },

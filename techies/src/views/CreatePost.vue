@@ -6,17 +6,31 @@
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-text-field
               type="text"
-              v-model="password"
+              v-model="title"
               :counter="80"
               :rules="titleRules"
               label="Title"
               rounded
               required
             ></v-text-field>
-            <v-textarea label="Overview for your posts" :rules="textRules" rounded auto-grow class></v-textarea>
+            <v-textarea
+              label="Overview for your posts"
+              v-model="description"
+              :rules="textRules"
+              rounded
+              auto-grow
+              class
+            ></v-textarea>
 
-            <div class="my-6 pl-6">
-              <v-btn outlined color="info" rounded required @click="onPickFile">Choose a file</v-btn>
+            <div class="mb-6">
+              <v-btn
+                v-if="!imageUrl"
+                outlined
+                color="info"
+                rounded
+                required
+                @click="onPickFile"
+              >Choose a file</v-btn>
               <input
                 type="file"
                 class="d-none"
@@ -25,8 +39,23 @@
                 @change="onFilePicked"
               />
               <v-img v-if="local_imageUrl" :src="local_imageUrl" width="150px" class="my-4"></v-img>
+              <div class="my-4" v-if="upload_btn">
+                <v-btn
+                  outlined
+                  small
+                  color="success"
+                  :loading="upload"
+                  rounded
+                  required
+                  @click="uploadFile"
+                >
+                  Upload
+                  <v-icon right dark>mdi-cloud-upload</v-icon>
+                </v-btn>
+              </div>
             </div>
             <v-textarea
+              v-model="content"
               label="Write the details here"
               :rules="textRules"
               rounded
@@ -60,7 +89,7 @@
             </v-select>
 
             <div class="d-flex justify-center align-center">
-              <v-btn outlined :disabled="!valid" color="info" @click="validate" rounded>Validate</v-btn>
+              <v-btn outlined :disabled="!valid" color="info" @click="create" rounded>Validate</v-btn>
             </div>
           </v-form>
         </v-col>
@@ -70,17 +99,20 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import { rules } from "@/mixins/rules.js";
-
+import store from "@/store/index.js";
+import firebase from "firebase/app";
+import "firebase/firestore";
 export default {
   mixins: [rules],
 
   data: () => ({
     valid: true,
-    password: "",
+    title: "",
 
-    email: "",
-
+    description: "",
+    content: "",
     select: null,
     items: ["Item 1", "Item 2", "Item 3", "Item 4"],
     tags: null,
@@ -88,9 +120,14 @@ export default {
     rawFile: null,
     local_imageUrl: null,
     imageUrl: null,
-    readTime: null
+    readTime: null,
+    upload: false,
+    upload_btn: false
   }),
   computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
     createReadTime() {
       let readTime = [];
       for (let x = 1; x <= 61; x++) {
@@ -105,11 +142,45 @@ export default {
         }
       }
       return readTime;
+    },
+    formattedDate() {
+      return new Date().toLocaleString(["en-US"], {
+        month: "short",
+        day: "2-digit",
+        year: "numeric"
+      });
     }
   },
   methods: {
-    validate() {
+    create() {
+      const post = {
+        title: this.title,
+        description: this.description,
+        author: this.user,
+        content: this.content,
+        image: this.imageUrl,
+        date: this.formattedDate,
+        uid: this.user.uid,
+        likes: [],
+        readTime: this.readTime,
+        tags: this.tags
+      };
       this.$refs.form.validate();
+      if (this.valid) {
+        this.loading = true;
+
+        store
+          .dispatch("posts/createPost", post)
+          .then(res => {
+            console.log(res);
+            this.loading = false;
+            this.$router.push({ name: "postshow", params: { id: res.postid } });
+          })
+          .catch(error => {
+            this.loading = false;
+            console.log(error);
+          });
+      }
     },
 
     onPickFile() {
@@ -128,7 +199,34 @@ export default {
           this.local_imageUrl = fileReader.result;
         });
         fileReader.readAsDataURL(file);
+        this.upload_btn = true;
       }
+    },
+    uploadFile() {
+      const filename = this.rawFile;
+      this.upload = true;
+      const key = Math.floor(Math.random() * 199054289);
+      const ext = filename.name.slice(filename.name.lastIndexOf("."));
+
+      const storageRef = firebase
+        .storage()
+        .ref("posts/" + key + ext)
+        .put(filename);
+
+      storageRef.on(
+        "state_changed",
+        function() {},
+        function() {
+          // Handle unsuccessful uploads
+        },
+        () => {
+          storageRef.snapshot.ref.getDownloadURL().then(downloadURL => {
+            this.imageUrl = downloadURL;
+            this.upload = false;
+            this.upload_btn = false;
+          });
+        }
+      );
     },
     toggle() {
       this.$nextTick(() => {
