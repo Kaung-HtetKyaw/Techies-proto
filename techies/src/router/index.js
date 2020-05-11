@@ -24,6 +24,13 @@ const routes = [
     path: "/login",
     name: "login",
     component: SigIn,
+    beforeEnter(to, from, next) {
+      if (store.state.user.user) {
+        next({ name: "postsfeed" });
+      } else {
+        next();
+      }
+    },
   },
   {
     path: "/signup",
@@ -42,7 +49,6 @@ const routes = [
     beforeEnter(to, from, next) {
       store.dispatch("posts/fetchPost", to.params.id).then((post) => {
         to.params.post = post;
-
         next();
       });
     },
@@ -66,14 +72,18 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
 });
-router.beforeEach((to, frim, next) => {
+router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some((el) => el.meta.requiresAuth);
   const currentUser = store.state.user.user;
-
+  console.log("beforeeach");
   if (requiresAuth && !currentUser) {
+    console.log("login", currentUser);
     next({ name: "login" });
+    console.log("login");
   } else {
+    console.log("next", currentUser);
     next();
+    console.log("next");
   }
 });
 

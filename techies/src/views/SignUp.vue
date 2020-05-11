@@ -11,7 +11,7 @@
                 <v-text-field
                   type="text"
                   v-model="displayName"
-                  :counter="10"
+                  :counter="20"
                   :rules="nameRules"
                   label="Name"
                   outlined
@@ -20,7 +20,7 @@
                 <v-text-field
                   type="password"
                   v-model="password"
-                  :counter="10"
+                  :counter="20"
                   :rules="passwordRules"
                   label="Password"
                   outlined
@@ -56,9 +56,6 @@
                       Upload
                       <v-icon right dark>mdi-cloud-upload</v-icon>
                     </v-btn>
-                  </div>
-                  <div class="my-4" v-if="upload_finish">
-                    <v-alert dense text type="success" dismissible>Upload Finished</v-alert>
                   </div>
                 </div>
 
@@ -121,8 +118,9 @@ export default {
         store
           .dispatch("user/signUp", user)
           .then(res => {
+            console.log(res);
             this.loading = false;
-            console.log("view", res);
+            this.$router.push({ name: "postsfeed" });
           })
           .catch(error => {
             this.loading = false;

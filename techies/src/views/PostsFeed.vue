@@ -1,9 +1,9 @@
 <template>
   <div>
-    <v-container>
-      <v-row dense>
+    <v-container class="py-0">
+      <v-row dense class="d-none d-md-flex flex-column">
         <v-col cols="12" sm="12" md="8" offset-md="2">
-          <Carousel class="d-none d-md-flex flex-column" />
+          <Carousel />
         </v-col>
       </v-row>
       <v-row dense>

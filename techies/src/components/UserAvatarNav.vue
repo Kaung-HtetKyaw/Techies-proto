@@ -6,6 +6,7 @@
       </v-avatar>
       <v-list-item-title class="ml-4 body-1">{{user.displayName}}</v-list-item-title>
     </v-list-item>
+    <v-divider class="my-2"></v-divider>
   </div>
 </template>
 

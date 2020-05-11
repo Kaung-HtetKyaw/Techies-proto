@@ -14,10 +14,8 @@
         </v-list-item-content>
       </v-list-item>
       <v-divider class="my-2"></v-divider>
-      <div v-if="!!user">
-        <UserInfo :user="user" />
-        <v-divider class="my-2"></v-divider>
-      </div>
+
+      <UserInfo v-if="!!user" :user="user" />
 
       <v-list nav dense>
         <v-list-item-group active-class="primary--text text--accent-4">

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div @click="signOut">
     <v-divider class="my-2"></v-divider>
     <v-list-item>
       <v-list-item-icon>
@@ -11,7 +11,20 @@
 </template>
 
 <script>
-export default {};
+import store from "@/store/index.js";
+export default {
+  methods: {
+    signOut() {
+      store
+        .dispatch("user/signOut")
+        .then(() => {
+          this.$router.push({ name: "login" });
+          console.log("out success");
+        })
+        .catch(error => [console.log(error)]);
+    }
+  }
+};
 </script>
 
 <style>

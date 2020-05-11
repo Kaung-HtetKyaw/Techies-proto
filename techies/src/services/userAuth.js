@@ -1,5 +1,6 @@
 import firebase from "firebase/app";
 import "firebase/firestore";
+import "firebase/auth";
 
 export default {
   signIn(user) {
@@ -11,6 +12,9 @@ export default {
     return firebase
       .auth()
       .createUserWithEmailAndPassword(user.email, user.password);
+  },
+  signOut() {
+    return firebase.auth().signOut();
   },
   currentUser() {
     return firebase.auth().currentUser;

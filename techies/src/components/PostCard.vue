@@ -1,5 +1,5 @@
 <template>
-  <div class="my-12">
+  <div class="my-6">
     <v-card class="mx-auto" elevation="0" color="#fff py-0">
       <v-card-title class="py-0 px-0">
         <v-chip v-for="tag in post.tags" :key="tag" class="ma-2" outlined>#{{tag}}</v-chip>
@@ -10,7 +10,7 @@
           <v-row dense class="d-flex flex-column-reverse flex-md-row">
             <v-col cols="12" sm="12" md="9" class="my-1">
               <router-link :to="{name:'postshow',params:{id:post.postid}}" class="router-link">
-                <h2 class="headline font-weight-bold black--text mb-4 serif">{{post.title}}</h2>
+                <h2 class="headline font-weight-medium black--text mb-4 serif">{{post.title}}</h2>
                 <h3
                   class="subtitle-1 black--text font-weight-medium mt-2 opacity7"
                 >{{post.description}}</h3>
