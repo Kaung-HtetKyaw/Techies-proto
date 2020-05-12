@@ -11,6 +11,7 @@ export default {
       .get();
   },
   fetchMorePosts(lastVisisble) {
+    console.log("enter");
     if (lastVisisble) {
       return firebase
         .firestore()
@@ -40,5 +41,12 @@ export default {
       .firestore()
       .collection("posts")
       .add(post);
+  },
+  updatePost(id, post) {
+    return firebase
+      .firestore()
+      .collection("posts")
+      .doc(id)
+      .set(post);
   },
 };

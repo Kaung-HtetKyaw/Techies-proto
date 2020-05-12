@@ -12,6 +12,9 @@ export const mutations = {
   CREATE_POST(state, post) {
     state.posts.push(post);
   },
+  UPDATE_POST(state, payload) {
+    state.posts.splice(payload.index, 1, payload.post);
+  },
   SET_POSTS(state, posts) {
     state.posts = posts;
   },
@@ -122,11 +125,41 @@ export const actions = {
       return commit_post;
     });
   },
+  updatePost({ commit, getters }, post) {
+    console.log("up", post);
+    const db_post = {
+      title: post.title,
+      description: post.description,
+      author: post.author,
+      content: post.content,
+      image: post.image,
+      date: post.date,
+      uid: post.uid,
+      likes: post.likes,
+      readTime: post.readTime,
+      tags: post.tags,
+    };
+    const index = getters.getPostIndex(post.postid);
+    const commit_post = {
+      index: index,
+      post: post,
+    };
+    return postServices.updatePost(post.postid, db_post).then((response) => {
+      console.log(response);
+      commit("UPDATE_POST", commit_post);
+      return post;
+    });
+  },
 };
 export const getters = {
   getPostByID: (state) => (id) => {
     console.log(state.posts);
     return state.posts.find((post) => {
+      return post.postid === id;
+    });
+  },
+  getPostIndex: (state) => (id) => {
+    return state.posts.findIndex((post) => {
       return post.postid === id;
     });
   },

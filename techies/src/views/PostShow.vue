@@ -10,40 +10,45 @@
               </v-col>
             </v-row>
             <v-row dense class="my-4">
+              <v-chip v-for="tag in post.tags" :key="tag" class="ma-2" outlined>#{{tag}}</v-chip>
+            </v-row>
+            <v-row dense class="my-4">
               <v-col cols="12" sm="12">
                 <h1 class="font-weight-bold header">{{post.title}}</h1>
               </v-col>
             </v-row>
             <v-row dense class="my-4">
-              <v-col
-                cols="12"
-                sm="12"
-                md="8"
-                class="d-flex justify-sm-start justify-md-center align-center"
-              >
-                <v-container class="py-0">
-                  <v-row dense class="d-flex flex-row align-center">
-                    <v-list-item class="grow px-0">
-                      <v-list-item-avatar color="grey darken-3">
-                        <v-img :src="post.author.photoURL"></v-img>
-                      </v-list-item-avatar>
+              <router-link :to="{name:'user',params:{id:post.uid}}" class="router-link">
+                <v-col
+                  cols="12"
+                  sm="12"
+                  md="8"
+                  class="d-flex justify-sm-start justify-md-center align-center"
+                >
+                  <v-container class="py-0">
+                    <v-row dense class="d-flex flex-row align-center">
+                      <v-list-item class="grow px-0">
+                        <v-list-item-avatar color="grey darken-3">
+                          <v-img :src="post.author.photoURL"></v-img>
+                        </v-list-item-avatar>
 
-                      <v-list-item-content>
-                        <v-list-item-title
-                          class="subtitle-1 font-weight-medium"
-                        >{{post.author.displayName}}</v-list-item-title>
-                        <v-list-item-title>
-                          <div class="opacity7">
-                            <span class="body-2">{{post.date}}</span>
-                            <span class="mx-1">|</span>
-                            <span class="body-2">{{post.readTime}} read</span>
-                          </div>
-                        </v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-row>
-                </v-container>
-              </v-col>
+                        <v-list-item-content>
+                          <v-list-item-title
+                            class="subtitle-1 font-weight-medium"
+                          >{{post.author.displayName}}</v-list-item-title>
+                          <v-list-item-title>
+                            <div class="opacity7">
+                              <span class="body-2">{{post.date}}</span>
+                              <span class="mx-1">|</span>
+                              <span class="body-2">{{post.readTime}} read</span>
+                            </div>
+                          </v-list-item-title>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-row>
+                  </v-container>
+                </v-col>
+              </router-link>
 
               <v-col
                 cols="12"
@@ -55,7 +60,7 @@
                   <v-btn icon color="pink">
                     <v-icon>mdi-heart</v-icon>
                   </v-btn>
-                  <span class="subheading mr-2">{{post.likes}}</span>
+                  <span class="subheading mr-2">{{post.likes.length}}</span>
                 </div>
 
                 <div>

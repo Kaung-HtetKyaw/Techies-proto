@@ -20,8 +20,9 @@
                       class="d-flex flex-column align-center align-md-start"
                     >
                       <h1 class="display-1 font-weight-medium">{{author.displayName}}</h1>
+                      <h3 class="my-2 title">{{author.bio}}</h3>
                       <h5 class="body-2 opacity7 font-weight-medium mb-2">Joined since May 20,2020</h5>
-                      <h5 class="body-2 font-weight-medium opacity9 my-1">{{author.email}}</h5>
+
                       <h5 class="body-2 font-weight-medium opacity9">
                         <span class="font-weight-bold">{{posts.length}}</span>
                         {{posts.length>1?'posts':'post'}} in total
@@ -51,11 +52,11 @@
           <PostCard v-for="post in posts" :key="post.postid" :post="post" />
         </v-col>
       </v-row>
-      <v-row dense v-else class="d-flex flex-column justify-center align-center">
-        <div class="my-4">
+      <v-row dense v-else class="d-flex flex-column justify-center align-center px-6">
+        <div class="my-2 my-md-4">
           <v-icon size="50" left>mdi-emoticon-sad-outline</v-icon>
         </div>
-        <h1 class="headline opacity7 my-4">Your dont't have any posts yet</h1>
+        <h1 class="headline opacity7 my-4 text-center">Your dont't have any posts yet</h1>
         <router-link :to="{name:'create'}" class="router-link">
           <v-btn outlined color="info" rounded>Create Now</v-btn>
         </router-link>

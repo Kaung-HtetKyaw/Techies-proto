@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="PostsFeed">
     <v-container class="py-0">
       <v-row dense class="d-none d-md-flex flex-column">
         <v-col cols="12" sm="12" md="8" offset-md="2">
@@ -53,7 +53,8 @@ export default {
   },
   methods: {
     scroll() {
-      window.onscroll = () => {
+      const postsfeed = document.getElementById("PostsFeed");
+      postsfeed.onscroll = () => {
         let bottomOfWindow =
           document.documentElement.scrollTop + window.innerHeight ===
           document.documentElement.offsetHeight;

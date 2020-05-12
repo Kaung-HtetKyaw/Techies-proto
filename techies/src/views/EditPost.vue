@@ -6,7 +6,7 @@
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-text-field
               type="text"
-              v-model="title"
+              v-model="post.title"
               :counter="80"
               :rules="titleRules"
               label="Title"
@@ -15,7 +15,7 @@
             ></v-text-field>
             <v-textarea
               label="Overview for your posts"
-              v-model="description"
+              v-model="post.description"
               :rules="textRules"
               rounded
               auto-grow
@@ -24,7 +24,7 @@
 
             <div class="mb-6">
               <v-btn
-                v-if="!imageUrl"
+                v-if="choose_btn"
                 outlined
                 color="info"
                 rounded
@@ -38,7 +38,7 @@
                 accept="image/*"
                 @change="onFilePicked"
               />
-              <v-img v-if="local_imageUrl" :src="local_imageUrl" width="300px" class="my-4"></v-img>
+              <v-img v-if="getImageUrl" :src="getImageUrl" width="300px" class="my-4"></v-img>
               <div class="my-4" v-if="upload_btn">
                 <v-btn
                   outlined
@@ -55,7 +55,7 @@
               </div>
             </div>
             <v-textarea
-              v-model="content"
+              v-model="post.content"
               label="Write the details here"
               :rules="textRules"
               rounded
@@ -63,7 +63,7 @@
               class="p-0"
             ></v-textarea>
             <v-select
-              v-model="tags"
+              v-model="post.tags"
               :items="categories"
               chips
               deletable-chips
@@ -76,7 +76,7 @@
               <template v-slot:prepend-item></template>
             </v-select>
             <v-select
-              v-model="readTime"
+              v-model="post.readTime"
               :items="createReadTime"
               chips
               deletable-chips
@@ -89,7 +89,14 @@
             </v-select>
 
             <div class="d-flex justify-center align-center">
-              <v-btn outlined :disabled="!valid" color="info" @click="create" rounded>Validate</v-btn>
+              <v-btn
+                outlined
+                :loading="loading"
+                :disabled="!valid"
+                color="info"
+                @click="update"
+                rounded
+              >Update</v-btn>
             </div>
           </v-form>
         </v-col>
@@ -106,29 +113,30 @@ import firebase from "firebase/app";
 import "firebase/firestore";
 export default {
   mixins: [rules],
-
+  props: {
+    post: {
+      type: Object,
+      required: true
+    }
+  },
   data: () => ({
     valid: true,
-    title: "",
-
-    description: "",
-    content: "",
-    select: null,
-
-    tags: null,
-    checkbox: false,
     rawFile: null,
     local_imageUrl: null,
     imageUrl: null,
-    readTime: null,
     upload: false,
-    upload_btn: false
+    upload_btn: false,
+    choose_btn: true,
+    loading: false
   }),
   computed: {
     ...mapState({
       user: state => state.user.user,
       categories: state => state.user.categories
     }),
+    getImageUrl() {
+      return this.local_imageUrl ? this.local_imageUrl : this.post.image;
+    },
     createReadTime() {
       let readTime = [];
       for (let x = 1; x <= 61; x++) {
@@ -153,25 +161,30 @@ export default {
     }
   },
   methods: {
-    create() {
+    update() {
+      console.log("post", this.post);
+      console.log("uid", this.post.author.uid);
+      console.log("user", this.user.uid);
       const post = {
-        title: this.title,
-        description: this.description,
-        author: this.user,
-        content: this.content,
-        image: this.imageUrl,
+        postid: this.post.postid,
+        title: this.post.title,
+        description: this.post.description,
+        author: this.post.author,
+        content: this.post.content,
+        image: this.post.image,
         date: this.formattedDate,
         uid: this.user.uid,
-        likes: [],
-        readTime: this.readTime,
-        tags: this.tags
+        likes: this.post.likes,
+        readTime: this.post.readTime,
+        tags: this.post.tags
       };
+      console.log("s post", post);
       this.$refs.form.validate();
       if (this.valid) {
         this.loading = true;
 
         store
-          .dispatch("posts/createPost", post)
+          .dispatch("posts/updatePost", post)
           .then(res => {
             console.log(res);
             this.loading = false;
@@ -222,9 +235,10 @@ export default {
         },
         () => {
           storageRef.snapshot.ref.getDownloadURL().then(downloadURL => {
-            this.imageUrl = downloadURL;
+            this.post.image = downloadURL;
             this.upload = false;
             this.upload_btn = false;
+            this.choose_btn = false;
           });
         }
       );

@@ -20,8 +20,18 @@ export const rules = {
         (v) => !!v || "Title is required",
         (v) => (v && v.length <= 80) || "Title must be less than 80 characters",
       ],
+      descriptionRules: [
+        (v) => !!v || "Description is required",
+        (v) =>
+          (v && v.length <= 300) ||
+          "Description must be less than 300 characters",
+      ],
       textRules: [(v) => !!v || "This field is required"],
       fileRules: [(v) => !!v || "Please choose a thumbnail for your post"],
+      bioRules: [
+        (v) => !!v || "Please describe yourself",
+        (v) => (v && v.length <= 200) || "Bio must be less than 200 characters",
+      ],
     };
   },
 };

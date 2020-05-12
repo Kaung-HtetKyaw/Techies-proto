@@ -5,6 +5,7 @@ import SigIn from "@/views/SignIn.vue";
 import SignUp from "@/views/SignUp.vue";
 import CreatePost from "@/views/CreatePost.vue";
 import PostShow from "@/views/PostShow.vue";
+import EditPost from "@/views/EditPost.vue";
 import User from "@/views/User.vue";
 import NProgress from "nprogress";
 import store from "@/store/index.js";
@@ -58,6 +59,20 @@ const routes = [
     name: "create",
     component: CreatePost,
     meta: { requiresAuth: true },
+  },
+  {
+    path: "/e/:id",
+    name: "edit",
+    component: EditPost,
+    meta: { requiresAuth: true },
+    props: true,
+    beforeEnter(to, from, next) {
+      store.dispatch("posts/fetchPost", to.params.id).then((post) => {
+        to.params.post = post;
+        console.log("post", post);
+        next();
+      });
+    },
   },
   {
     path: "/u/:id",

@@ -26,6 +26,28 @@
                   outlined
                   required
                 ></v-text-field>
+                <v-textarea
+                  counter="200"
+                  v-model="bio"
+                  label="Describe yourself"
+                  :rules="bioRules"
+                  outlined
+                  auto-grow
+                  class="p-0"
+                ></v-textarea>
+                <v-select
+                  v-model="tags"
+                  :items="categories"
+                  chips
+                  deletable-chips
+                  label="Select Your interest"
+                  multiple
+                  :rules="selectRules"
+                  required
+                  rounded
+                >
+                  <template v-slot:prepend-item></template>
+                </v-select>
                 <div class="mb-6">
                   <v-btn
                     v-if="!imageUrl"
@@ -34,7 +56,7 @@
                     rounded
                     required
                     @click="onPickFile"
-                  >Choose a file</v-btn>
+                  >Choose Profile Photo</v-btn>
                   <input
                     type="file"
                     class="d-none"
@@ -79,6 +101,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import { rules } from "@/mixins/rules.js";
 import firebase from "firebase/app";
 import "firebase/firestore";
@@ -89,11 +112,11 @@ export default {
   mixins: [rules],
   data: () => ({
     valid: true,
+    tags: null,
+    bio: "",
     password: "",
-
     email: "",
     displayName: "",
-
     rawFile: null,
     local_imageUrl: null,
     imageUrl: null,
@@ -102,6 +125,11 @@ export default {
     upload_finish: false,
     loading: false
   }),
+  computed: {
+    ...mapState({
+      categories: state => state.user.categories
+    })
+  },
 
   methods: {
     validate() {
@@ -110,7 +138,9 @@ export default {
         email: this.email,
         displayName: this.displayName,
         password: this.password,
-        photoURL: this.imageUrl
+        photoURL: this.imageUrl,
+        tags: this.tags,
+        bio: this.bio
       };
 
       if (this.valid) {

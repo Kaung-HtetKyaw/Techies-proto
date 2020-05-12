@@ -6,6 +6,29 @@ export const state = {
   photoURL: null,
   log_in: false,
   author: {},
+  categories: [
+    "Future",
+    "Technology",
+    "Health",
+    "Science",
+    "Business",
+    "Work",
+    "Culture",
+    "Beauty",
+    "Food",
+    "Programming",
+    "Design",
+    "Politics",
+    "Relationships",
+    "Startups",
+    "Crytocurrency",
+    "Data Science",
+    "Productivity",
+    "Artificial Intelligence",
+    "Religions",
+    "Culture",
+    "Other",
+  ],
 };
 export const mutations = {
   CHECK_INITIAL_USER_STATE(state, user) {
@@ -81,14 +104,16 @@ export const actions = {
         displayName: user.displayName,
         email: user.email,
         photoURL: user.photoURL,
+        tags: user.tags,
+        bio: user.bio,
         uid: res.user.uid, //*get uid from response from firebase
         joined: res.user.metadata.creationTime, //*get joined date
       };
-      userServices.addUserInfo(commit_user).then((response) => {
+      return userServices.addUserInfo(commit_user).then((response) => {
         console.log("added user", response);
         commit("SIGN_UP", commit_user);
+        return commit_user;
       });
-      return commit_user;
     });
   },
   signOut({ commit }) {

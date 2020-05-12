@@ -13,7 +13,7 @@
                 <h2 class="headline font-weight-medium black--text mb-4 serif">{{post.title}}</h2>
                 <h3
                   class="subtitle-1 black--text font-weight-medium mt-2 opacity7"
-                >{{post.description}}</h3>
+                >{{formattedDescription}}</h3>
               </router-link>
             </v-col>
             <v-col cols="12" sm="12" md="3" class="d-flex justify-center align-center my-1">
@@ -63,14 +63,21 @@
                 <v-btn icon color="pink">
                   <v-icon>mdi-heart</v-icon>
                 </v-btn>
-                <span class="subheading mr-2">256</span>
+                <span class="subheading mr-2">{{post.likes.length}}</span>
               </div>
 
               <div>
                 <v-btn icon color="info">
                   <v-icon>mdi-bookmark-outline</v-icon>
                 </v-btn>
-                <span class="subheading">45</span>
+              </div>
+
+              <div v-if="post.uid===user.uid">
+                <router-link :to="{name:'edit',params:{id:post.postid}}" class="router-link">
+                  <v-btn icon color="info">
+                    <v-icon>mdi-pencil-circle-outline</v-icon>
+                  </v-btn>
+                </router-link>
               </div>
             </v-col>
           </v-row>
@@ -82,11 +89,25 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   props: {
     post: {
       type: Object,
       required: true
+    }
+  },
+  computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
+    formattedDescription() {
+      const desp = this.post.description.split(" ");
+      const formatted_desp = this.post.description
+        .split(" ")
+        .slice(0, 50)
+        .join(" ");
+      return desp.length > 50 ? formatted_desp + "...." : formatted_desp;
     }
   }
 };
