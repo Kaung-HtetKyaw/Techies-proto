@@ -3,7 +3,7 @@
     <v-container>
       <v-row dense>
         <v-col cols="12" sm="12" md="6" offset-md="3">
-          <v-card>
+          <v-card :loading="loading">
             <v-card-title class="primary lighten-1 white--text text-center">Sign Up</v-card-title>
             <v-card-text class="mt-6">
               <v-form ref="form" class="px-2" v-model="valid" @submit="validate" @enter="validate">
@@ -44,7 +44,7 @@
                   multiple
                   :rules="selectRules"
                   required
-                  rounded
+                  outlined
                 >
                   <template v-slot:prepend-item></template>
                 </v-select>

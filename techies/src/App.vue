@@ -9,6 +9,7 @@
     </v-content>
     <footer>
       <Footer />
+      <NotiContainer />
     </footer>
   </v-app>
 </template>
@@ -16,6 +17,7 @@
 <script>
 import TheNav from "@/components/TheNav.vue";
 import Footer from "@/components/Footer.vue";
+import NotiContainer from "@/components/NotificationContainer.vue";
 import userServices from "@/services/userAuth.js";
 import store from "@/store/index.js";
 export default {
@@ -23,7 +25,8 @@ export default {
 
   components: {
     TheNav,
-    Footer
+    Footer,
+    NotiContainer
   },
 
   data: () => ({

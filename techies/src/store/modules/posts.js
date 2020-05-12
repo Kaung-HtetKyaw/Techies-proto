@@ -1,4 +1,5 @@
 import postServices from "@/services/posts.js";
+import uniqueId from "@/services/uniqueId.js";
 export const namespaced = true;
 export const state = {
   posts: [],
@@ -38,19 +39,22 @@ export const mutations = {
 export const actions = {
   fetchPosts({ commit, state }) {
     let posts = [];
-    return postServices.fetchPosts().then((response) => {
-      state.lastVisiblePost = response.docs[response.docs.length - 1];
-      response.docs.forEach((post) => {
-        posts.push({
-          postid: post.id,
-          ...post.data(),
+    return postServices
+      .fetchPosts()
+      .then((response) => {
+        state.lastVisiblePost = response.docs[response.docs.length - 1];
+        response.docs.forEach((post) => {
+          posts.push({
+            postid: post.id,
+            ...post.data(),
+          });
         });
-      });
-      commit("SET_POSTS", posts);
-      commit("SET_EMPTY_POST", false);
+        commit("SET_POSTS", posts);
+        commit("SET_EMPTY_POST", false);
 
-      return posts;
-    });
+        return posts;
+      })
+      .catch((error) => console.log(error));
   },
   fetchMorePosts({ commit, state }) {
     const db_response = postServices.fetchMorePosts(state.lastVisiblePost);
@@ -70,21 +74,16 @@ export const actions = {
         return posts;
       });
     } else {
-      console.log("empty");
       commit("SET_EMPTY_POST", true);
     }
   },
   fetchPost({ commit, getters }, id) {
-    console.log("fetchpost");
     //*check the post with payload id already exist?
     const existed_post = getters.getPostByID(id);
     if (existed_post) {
-      console.log(existed_post);
-      console.log("exist");
       commit("SET_POST", existed_post);
       return existed_post;
     } else {
-      console.log("no exist");
       return postServices
         .fetchPost(id)
         .then((response) => {
@@ -101,9 +100,8 @@ export const actions = {
   fetchUserPosts({ commit }, uid) {
     let posts = [];
     return postServices.fetchUserPosts(uid).then((response) => {
-      console.log("response", response);
       commit("SET_AUTHOR_PROFILE", response);
-      console.log("u p", response.docs);
+
       response.docs.forEach((post) => {
         posts.push({
           postid: post.id,
@@ -113,20 +111,43 @@ export const actions = {
       return { posts };
     });
   },
-  createPost({ commit }, post) {
-    return postServices.createPost(post).then((response) => {
-      const commit_post = {
-        postid: response.id,
-        ...post,
-      };
-      console.log("response id", response);
-      console.log("response data", commit_post);
-      commit("CREATE_POST", commit_post);
-      return commit_post;
-    });
+  createPost({ commit, dispatch }, post) {
+    return postServices
+      .createPost(post)
+      .then((response) => {
+        //*format the response to commit
+        const commit_post = {
+          postid: response.id,
+          ...post,
+        };
+        const id = uniqueId.uniqueId();
+        const commit_noti = {
+          type: "success",
+          id: id,
+          message: "Post Created",
+        };
+
+        dispatch("notification/addNoti", commit_noti, { root: true }).then(
+          () => {
+            commit("CREATE_POST", commit_post);
+          }
+        );
+        return commit_post;
+      })
+      .catch((error) => {
+        if (error.code) {
+          const errorMsg = error.code.split("/")[1];
+          const id = uniqueId.uniqueId();
+          const commit_noti = {
+            id: id,
+            type: "error",
+            message: errorMsg,
+          };
+          dispatch("notification/deleteNoti", commit_noti, { root: true });
+        }
+      });
   },
-  updatePost({ commit, getters }, post) {
-    console.log("up", post);
+  updatePost({ commit, getters, dispatch }, post) {
     const db_post = {
       title: post.title,
       description: post.description,
@@ -144,16 +165,22 @@ export const actions = {
       index: index,
       post: post,
     };
-    return postServices.updatePost(post.postid, db_post).then((response) => {
-      console.log(response);
+    return postServices.updatePost(post.postid, db_post).then(() => {
       commit("UPDATE_POST", commit_post);
+      const id = uniqueId.uniqueId();
+      const commit_noti = {
+        type: "success",
+        id: id,
+        message: "Post Updated",
+      };
+
+      dispatch("notification/addNoti", commit_noti, { root: true });
       return post;
     });
   },
 };
 export const getters = {
   getPostByID: (state) => (id) => {
-    console.log(state.posts);
     return state.posts.find((post) => {
       return post.postid === id;
     });

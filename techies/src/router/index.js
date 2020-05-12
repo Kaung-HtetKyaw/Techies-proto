@@ -68,9 +68,13 @@ const routes = [
     props: true,
     beforeEnter(to, from, next) {
       store.dispatch("posts/fetchPost", to.params.id).then((post) => {
-        to.params.post = post;
-        console.log("post", post);
-        next();
+        if (post.uid === store.state.user.user.uid) {
+          to.params.post = post;
+          console.log("post", post);
+          next();
+        } else {
+          next({ name: "postsfeed" });
+        }
       });
     },
   },
