@@ -51,6 +51,9 @@ export default {
       empty: state => state.posts.isEmpty
     })
   },
+  created() {
+    console.log("postsfeed posts", this.posts);
+  },
   methods: {
     scroll() {
       const postsfeed = document.getElementById("PostsFeed");

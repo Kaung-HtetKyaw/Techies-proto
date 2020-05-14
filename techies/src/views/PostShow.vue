@@ -83,12 +83,21 @@
           </v-container>
         </v-col>
       </v-row>
+      <v-row dense>
+        <v-col cols="12" sm="12" md="8" offset-md="2">
+          <CommentContainer :postid="post.postid" />
+        </v-col>
+      </v-row>
     </v-container>
   </div>
 </template>
 
 <script>
+import CommentContainer from "@/components/CommentContainer.vue";
 export default {
+  components: {
+    CommentContainer
+  },
   props: {
     post: {
       type: Object,

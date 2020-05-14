@@ -20,7 +20,9 @@
                       class="d-flex flex-column align-center align-md-start"
                     >
                       <h1 class="display-1 font-weight-medium">{{author.displayName}}</h1>
-                      <h3 class="my-2 title">{{author.bio}}</h3>
+                      <h3
+                        class="text-center text-md-left my-2 sibtitle-2 font-weight-medium"
+                      >{{author.bio}}</h3>
                       <h5 class="body-2 opacity7 font-weight-medium mb-2">Joined since May 20,2020</h5>
 
                       <h5 class="body-2 font-weight-medium opacity9">
@@ -65,10 +67,30 @@
   </div>
 </template>
 
+
+
 <script>
 import PostCard from "@/components/PostCard.vue";
 import { mapState } from "vuex";
+import store from "@/store/index.js";
+function fetchInfo(to, next) {
+  console.log("user id", to.params.id);
+  store.dispatch("user/fetchUser", to.params.id).then(user => {
+    store.dispatch("posts/fetchUserPosts", user.uid).then(res => {
+      console.log("res", res);
+      to.params.author = user;
+      to.params.posts = res.posts;
+      next();
+    });
+  });
+}
 export default {
+  beforeRouteEnter(to, from, next) {
+    fetchInfo(to, next);
+  },
+  beforeRouteUpdate(to, from, next) {
+    fetchInfo(to, next);
+  },
   props: {
     author: {
       type: Object,
@@ -76,6 +98,10 @@ export default {
     },
     posts: {
       type: Array,
+      required: true
+    },
+    id: {
+      type: String,
       required: true
     }
   },
@@ -85,6 +111,7 @@ export default {
   created() {
     console.log("author", this.author);
     console.log("posts", this.posts);
+    console.log("id", this.id);
   },
   computed: {
     ...mapState({
@@ -93,7 +120,8 @@ export default {
     // fomattedDate(){
     //   return this.author.joined.split(' ').slice(1,4)
     // }
-  }
+  },
+  methods: {}
 };
 </script>
 

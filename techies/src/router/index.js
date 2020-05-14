@@ -84,16 +84,6 @@ const routes = [
     component: User,
     props: true,
     meta: { requiresAuth: true },
-    beforeEnter(to, from, next) {
-      store.dispatch("user/fetchUser", to.params.id).then((user) => {
-        store.dispatch("posts/fetchUserPosts", user.uid).then((res) => {
-          console.log("res", res);
-          to.params.author = user;
-          to.params.posts = res.posts;
-          next();
-        });
-      });
-    },
   },
 ];
 
