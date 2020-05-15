@@ -16,6 +16,13 @@
           <v-skeleton-loader v-if="loading" ref="skeleton" type="article" class="mx-auto"></v-skeleton-loader>
         </v-col>
       </v-row>
+      <v-row dense class="mb-6" v-if="empty">
+        <v-col cols="12" sm="12" md="8" offset-md="2" class="d-flex justify-center align-center">
+          <v-chip class="ma-2" color="warning" outlined>
+            <v-icon left>mdi-emoticon-sad-outline</v-icon>End of results
+          </v-chip>
+        </v-col>
+      </v-row>
     </v-container>
   </div>
 </template>
@@ -56,8 +63,7 @@ export default {
   },
   methods: {
     scroll() {
-      const postsfeed = document.getElementById("PostsFeed");
-      postsfeed.onscroll = () => {
+      window.onscroll = () => {
         let bottomOfWindow =
           document.documentElement.scrollTop + window.innerHeight ===
           document.documentElement.offsetHeight;
@@ -86,5 +92,8 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.round-border {
+  border-radius: 100px;
+}
 </style>

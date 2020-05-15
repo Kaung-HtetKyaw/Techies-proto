@@ -48,6 +48,7 @@
 import { rules } from "@/mixins/rules.js";
 import store from "@/store/index.js";
 export default {
+  components: {},
   mixins: [rules],
   data: () => ({
     valid: true,

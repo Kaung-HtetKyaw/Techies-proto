@@ -55,9 +55,10 @@ export const mutations = {
 };
 export const actions = {
   checkInitialUser({ commit, dispatch }, user) {
+    console.log("current user check", user);
     return userServices.fetchUser(user.uid).then((res) => {
+      console.log("return user check", res.data());
       const commit_user = {
-        uid: res.id,
         ...res.data(),
       };
 
@@ -75,6 +76,7 @@ export const actions = {
   },
   fetchUser({ commit }, id) {
     return userServices.fetchUser(id).then((res) => {
+      console.log("fetch user", res.data());
       const commit_user = {
         uid: res.id,
         ...res.data(),
@@ -117,34 +119,35 @@ export const actions = {
       })
       .catch((error) => console.log(error));
   },
-  signUp({ commit, dispatch }, user) {
-    //* format user obj to commit obj for excluding password
-    let commit_user;
-    //* reach out to sign up service
-    return userServices.signUp(user).then((res) => {
-      commit_user = {
-        displayName: user.displayName,
-        email: user.email,
-        photoURL: user.photoURL,
-        tags: user.tags,
-        bio: user.bio,
-        uid: res.user.uid, //*get uid from response from firebase
-        joined: res.user.metadata.creationTime, //*get joined date
-      };
-      return userServices.addUserInfo(commit_user).then(() => {
-        const id = uniqueId.uniqueId();
-        const commit_noti = {
-          type: "success",
-          id: id,
-          message: `Account Created`,
-        };
+  signInWithGoogle({ commit }) {
+    return userServices.signInWithGoogle().then((result) => {
+      console.log("rssult", result);
+      const proxy = result.user;
 
+      return userServices.fetchUser(proxy.uid).then((res) => {
+        const commit_user = {
+          uid: proxy.uid,
+          ...res.data(),
+        };
         commit("SIGN_UP", commit_user);
-        dispatch("notification/addNoti", commit_noti, { root: true }).then(
-          () => {
-            return commit_user;
-          }
-        );
+        return commit_user;
+      });
+    });
+  },
+  updateProfile({ commit, dispatch }, user) {
+    //* format user obj to commit obj for excluding password
+
+    return userServices.addUserInfo(user).then(() => {
+      const id = uniqueId.uniqueId();
+      const commit_noti = {
+        type: "success",
+        id: id,
+        message: `Account Created`,
+      };
+
+      commit("SIGN_UP", user);
+      dispatch("notification/addNoti", commit_noti, { root: true }).then(() => {
+        return user;
       });
     });
   },

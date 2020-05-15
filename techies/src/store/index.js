@@ -7,7 +7,7 @@ import * as comment from "@/store/modules/comment.js";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  state: {},
+  state: { nav_color: "primary lighten-1" },
   mutations: {},
   actions: {},
   getters: {},

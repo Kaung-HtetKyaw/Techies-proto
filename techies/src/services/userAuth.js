@@ -8,6 +8,10 @@ export default {
       .auth()
       .signInWithEmailAndPassword(user.email, user.password);
   },
+  signInWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    return firebase.auth().signInWithPopup(provider);
+  },
   signUp(user) {
     return firebase
       .auth()

@@ -1,12 +1,15 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
+import Home from "@/views/Home.vue";
 import PostsFeed from "../views/PostsFeed.vue";
 import SigIn from "@/views/SignIn.vue";
 import SignUp from "@/views/SignUp.vue";
 import CreatePost from "@/views/CreatePost.vue";
 import PostShow from "@/views/PostShow.vue";
 import EditPost from "@/views/EditPost.vue";
+import NotFound from "@/components/404.vue";
 import User from "@/views/User.vue";
+import UpdateProfile from "@/views/UpdateProfile.vue";
 import NProgress from "nprogress";
 import store from "@/store/index.js";
 
@@ -16,6 +19,12 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
+    name: "home",
+    component: Home,
+    props: true,
+  },
+  {
+    path: "/pf",
     name: "postsfeed",
     component: PostsFeed,
     props: true,
@@ -85,6 +94,22 @@ const routes = [
     props: true,
     meta: { requiresAuth: true },
   },
+  {
+    path: "updateP",
+    name: "updateprofile",
+    component: UpdateProfile,
+
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/404",
+    name: "404",
+    component: NotFound,
+  },
+  {
+    path: "*",
+    redirect: { name: "404" },
+  },
 ];
 
 const router = new VueRouter({
@@ -98,7 +123,7 @@ router.beforeEach((to, from, next) => {
   const currentUser = store.state.user.user;
 
   if (requiresAuth && !currentUser) {
-    next({ name: "login" });
+    next({ name: "home" });
   } else {
     console.log("next", currentUser);
     next();

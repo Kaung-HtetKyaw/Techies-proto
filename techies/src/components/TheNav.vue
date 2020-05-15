@@ -20,7 +20,7 @@
       <v-list nav dense>
         <v-list-item-group active-class="primary--text text--accent-4">
           <!-- Persistent menu -->
-          <router-link :to="{name:'postsfeed'}" class="router-link">
+          <router-link v-if="!!user" :to="{name:'postsfeed'}" class="router-link">
             <v-list-item>
               <v-list-item-icon>
                 <v-icon>mdi-post-outline</v-icon>
@@ -46,23 +46,23 @@
                 <v-list-item-title>My Posts</v-list-item-title>
               </v-list-item>
             </router-link>
+            <!-- User related -->
+            <div v-if="!!user">
+              <v-divider class="my-2"></v-divider>
+              <router-link :to="{name:'updateprofile'}" class="router-link">
+                <v-list-item>
+                  <v-list-item-icon>
+                    <v-icon>mdi-card-text-outline</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-title>Update Profile</v-list-item-title>
+                </v-list-item>
+              </router-link>
+            </div>
           </template>
 
           <!-- Logged out menu -->
           <template v-if="!user">
-            <router-link
-              v-for="list in log_out_lists"
-              :key="list.name"
-              :to="{name:list.link}"
-              class="router-link"
-            >
-              <v-list-item>
-                <v-list-item-icon>
-                  <v-icon>{{list.icon}}</v-icon>
-                </v-list-item-icon>
-                <v-list-item-title>{{list.name}}</v-list-item-title>
-              </v-list-item>
-            </router-link>
+            <GoogleSignIn />
           </template>
 
           <SignOut v-if="!!user" />
@@ -76,14 +76,29 @@
 <script>
 import UserInfo from "@/components/UserAvatarNav.vue";
 import SignOut from "@/components/Signout.vue";
+import GoogleSignIn from "@/components/GoogleSignBtn.vue";
 import { mapState } from "vuex";
+
 export default {
   components: {
     UserInfo,
-    SignOut
+    SignOut,
+    GoogleSignIn
   },
   data: () => ({
     drawer: false,
+    persistent_lists: [
+      {
+        name: "Posts Feed",
+        link: "postsfeed",
+        icon: "mdi-post-outline"
+      },
+      {
+        name: "Update Profile",
+        link: "updateprofile",
+        icon: "mdi-pencil"
+      }
+    ],
     log_out_lists: [
       {
         name: "Login",
@@ -99,7 +114,8 @@ export default {
   }),
   computed: {
     ...mapState({
-      user: state => state.user.user
+      user: state => state.user.user,
+      nav_color: state => state.nav_color
     })
   }
 };

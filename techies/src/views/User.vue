@@ -23,7 +23,7 @@
                       <h3
                         class="text-center text-md-left my-2 sibtitle-2 font-weight-medium"
                       >{{author.bio}}</h3>
-                      <h5 class="body-2 opacity7 font-weight-medium mb-2">Joined since May 20,2020</h5>
+                      <h5 class="body-2 opacity7 font-weight-medium mb-2">Joined since {{trimTime}}</h5>
 
                       <h5 class="body-2 font-weight-medium opacity9">
                         <span class="font-weight-bold">{{posts.length}}</span>
@@ -37,7 +37,7 @@
                         color="white"
                         class="mt-4"
                       >
-                        <v-icon left>mdi-pencil</v-icon>Edit
+                        <v-icon left>mdi-pencil</v-icon>Update Profile
                       </v-btn>
                     </v-col>
                   </v-row>
@@ -72,6 +72,7 @@
 <script>
 import PostCard from "@/components/PostCard.vue";
 import { mapState } from "vuex";
+
 import store from "@/store/index.js";
 function fetchInfo(to, next) {
   console.log("user id", to.params.id);
@@ -91,6 +92,7 @@ export default {
   beforeRouteUpdate(to, from, next) {
     fetchInfo(to, next);
   },
+
   props: {
     author: {
       type: Object,
@@ -116,7 +118,13 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user
-    })
+    }),
+    trimTime() {
+      return this.author.joined
+        .split(" ")
+        .slice(1, 4)
+        .join(" ");
+    }
     // fomattedDate(){
     //   return this.author.joined.split(' ').slice(1,4)
     // }

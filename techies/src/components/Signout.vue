@@ -18,7 +18,7 @@ export default {
       store
         .dispatch("user/signOut")
         .then(() => {
-          this.$router.push({ name: "login" });
+          this.$router.push({ name: "home" });
           console.log("out success");
         })
         .catch(error => [console.log(error)]);
