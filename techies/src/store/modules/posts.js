@@ -1,8 +1,10 @@
 import postServices from "@/services/posts.js";
 import uniqueId from "@/services/uniqueId.js";
+import PostFactory from "@/Factory/Post/PostFactory.js";
 export const namespaced = true;
 export const state = {
   posts: [],
+  popularPosts: [],
   author_profile: {},
   author_posts: [],
   post: [],
@@ -18,6 +20,9 @@ export const mutations = {
   },
   SET_POSTS(state, posts) {
     state.posts = posts;
+  },
+  SET_POPULAR_POSTS(state, posts) {
+    state.popularPosts = posts;
   },
   SET_POST(state, post) {
     state.post = post;
@@ -38,17 +43,21 @@ export const mutations = {
 
 export const actions = {
   fetchPosts({ commit, state }) {
+    //* initialize the posts array
     let posts = [];
+    //*reach out to the server
     return postServices
       .fetchPosts()
       .then((response) => {
+        //*set last posts scrolled for infinite scrolling
         state.lastVisiblePost = response.docs[response.docs.length - 1];
+        //*iterate response object to push to the posts
         response.docs.forEach((post) => {
-          posts.push({
-            postid: post.id,
-            ...post.data(),
-          });
+          //* format posts with Factory pattern
+          const factoryPost = PostFactory.createFromDB(post);
+          posts.push(factoryPost);
         });
+
         commit("SET_POSTS", posts);
         commit("SET_EMPTY_POST", false);
 
@@ -63,12 +72,10 @@ export const actions = {
       return db_response.then((response) => {
         //*set the latest visible post for later fetch
         state.lastVisiblePost = response.docs[response.docs.length - 1];
-        //*format the posts array
+        //*format the posts array with factory pattern
         response.docs.forEach((post) => {
-          posts.push({
-            postid: post.id,
-            ...post.data(),
-          });
+          const factoryPost = PostFactory.createFromDB(post);
+          posts.push(factoryPost);
         });
         commit("SET_MORE_POSTS", posts);
         return posts;
@@ -87,9 +94,10 @@ export const actions = {
       return postServices
         .fetchPost(id)
         .then((response) => {
+          //*format the post with Factory pattern
+          const factoryPost = PostFactory.createFromDB(response);
           let post = {
-            postid: response.id,
-            ...response.data(),
+            ...factoryPost,
           };
           commit("SET_POST", post);
           return post;
@@ -102,13 +110,22 @@ export const actions = {
     return postServices.fetchUserPosts(uid).then((response) => {
       commit("SET_AUTHOR_PROFILE", response);
 
+      //*format the post with Factory pattern
       response.docs.forEach((post) => {
-        posts.push({
-          postid: post.id,
-          ...post.data(),
-        });
+        const factoryPost = PostFactory.createFromDB(post);
+        posts.push(factoryPost);
       });
       return { posts };
+    });
+  },
+  fetchPopularPosts({ commit }) {
+    let posts = [];
+    return postServices.fetchPopularPosts().then((res) => {
+      res.docs.forEach((el) => {
+        posts.push(PostFactory.createFromDB(el));
+      });
+      commit("SET_POPULAR_POSTS", posts);
+      return posts;
     });
   },
   createPost({ commit, dispatch }, post) {
@@ -118,7 +135,7 @@ export const actions = {
         //*format the response to commit
         const commit_post = {
           postid: response.id,
-          ...post,
+          ...PostFactory.create(post),
         };
         const id = uniqueId.uniqueId();
         const commit_noti = {
@@ -148,25 +165,19 @@ export const actions = {
       });
   },
   updatePost({ commit, getters, dispatch }, post) {
+    //* firebase wont accept custom object(Post object in this case)
+    //*so it should be destructured
     const db_post = {
-      title: post.title,
-      description: post.description,
-      author: post.author,
-      content: post.content,
-      image: post.image,
-      date: post.date,
-      uid: post.uid,
-      likes: post.likes,
-      readTime: post.readTime,
-      tags: post.tags,
+      ...PostFactory.create(post.post),
     };
     const index = getters.getPostIndex(post.postid);
     const commit_post = {
       index: index,
-      post: post,
+      post: db_post,
     };
     return postServices.updatePost(post.postid, db_post).then(() => {
       commit("UPDATE_POST", commit_post);
+      //*Noti
       const id = uniqueId.uniqueId();
       const commit_noti = {
         type: "success",

@@ -3,7 +3,7 @@
     <v-container class="py-0">
       <v-row dense class="d-none d-md-flex flex-column">
         <v-col cols="12" sm="12" md="8" offset-md="2">
-          <Carousel />
+          <Carousel :posts="popularPosts" />
         </v-col>
       </v-row>
       <v-row dense>
@@ -30,6 +30,7 @@
 <script>
 import PostCard from "@/components/PostCard.vue";
 import Carousel from "@/components/PopularCarousel.vue";
+
 import store from "@/store/index.js";
 import NProgress from "nprogress";
 import { mapState } from "vuex";
@@ -46,16 +47,19 @@ export default {
   beforeRouteEnter(to, from, next) {
     NProgress.start();
     store.dispatch("posts/fetchPosts").then(response => {
-      NProgress.done();
-      console.log(response);
-      next();
+      store.dispatch("posts/fetchPopularPosts").then(() => {
+        NProgress.done();
+        console.log(response);
+        next();
+      });
     });
   },
 
   computed: {
     ...mapState({
       posts: state => state.posts.posts,
-      empty: state => state.posts.isEmpty
+      empty: state => state.posts.isEmpty,
+      popularPosts: state => state.posts.popularPosts
     })
   },
   created() {
@@ -95,5 +99,13 @@ export default {
 <style scoped>
 .round-border {
   border-radius: 100px;
+}
+.pos-relative {
+  position: relative;
+}
+.pos-fixed {
+  position: fixed;
+  height: 700px;
+  margin-top: 5rem;
 }
 </style>

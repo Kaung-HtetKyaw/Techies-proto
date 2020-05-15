@@ -163,6 +163,7 @@ export default {
         date: this.formattedDate,
         uid: this.user.uid,
         likes: [],
+        likesNo: 0,
         readTime: this.readTime,
         tags: this.tags
       };

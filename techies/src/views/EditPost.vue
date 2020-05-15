@@ -166,7 +166,6 @@ export default {
       console.log("uid", this.post.author.uid);
       console.log("user", this.user.uid);
       const post = {
-        postid: this.post.postid,
         title: this.post.title,
         description: this.post.description,
         author: this.post.author,
@@ -175,6 +174,7 @@ export default {
         date: this.formattedDate,
         uid: this.user.uid,
         likes: this.post.likes,
+        likesNo: this.post.likesNo,
         readTime: this.post.readTime,
         tags: this.post.tags
       };
@@ -184,7 +184,10 @@ export default {
         this.loading = true;
 
         store
-          .dispatch("posts/updatePost", post)
+          .dispatch("posts/updatePost", {
+            postid: this.post.postid,
+            post: post
+          })
           .then(res => {
             console.log(res);
             this.loading = false;

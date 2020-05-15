@@ -1,5 +1,6 @@
 import userServices from "@/services/userAuth.js";
 import uniqueId from "@/services/uniqueId.js";
+import UserFactory from "@/Factory/User/UserFactory";
 export const namespaced = true;
 export const state = {
   user: null,
@@ -59,7 +60,7 @@ export const actions = {
     return userServices.fetchUser(user.uid).then((res) => {
       console.log("return user check", res.data());
       const commit_user = {
-        ...res.data(),
+        ...UserFactory.createFromDB(res),
       };
 
       const id = uniqueId.uniqueId();
@@ -71,6 +72,7 @@ export const actions = {
 
       dispatch("notification/addNoti", commit_noti, { root: true }).then(() => {
         commit("CHECK_INITIAL_USER_STATE", commit_user);
+        return commit_user;
       });
     });
   },
@@ -79,7 +81,7 @@ export const actions = {
       console.log("fetch user", res.data());
       const commit_user = {
         uid: res.id,
-        ...res.data(),
+        ...UserFactory.createFromDB(res),
       };
 
       commit("FETCH_USER", commit_user);
@@ -119,18 +121,51 @@ export const actions = {
       })
       .catch((error) => console.log(error));
   },
-  signInWithGoogle({ commit }) {
-    return userServices.signInWithGoogle().then((result) => {
-      console.log("rssult", result);
-      const proxy = result.user;
+  signInWithGoogle({ commit, dispatch }) {
+    //*sign in with google
+    return userServices.signInWithGoogle().then((sign_res) => {
+      //*fetch the user with uid got from google sign in
+      return userServices.fetchUser(sign_res.user.uid).then((user_res) => {
+        //*if old user=> just fetch it and commit
+        if (user_res.data()) {
+          //*Format the user with Factory pattern
+          const user = UserFactory.createFromDB(user_res);
+          //*Noti
+          const id = uniqueId.uniqueId();
+          const commit_noti = {
+            type: "success",
+            id: id,
+            message: `Account Created`,
+          };
 
-      return userServices.fetchUser(proxy.uid).then((res) => {
-        const commit_user = {
-          uid: proxy.uid,
-          ...res.data(),
-        };
-        commit("SIGN_UP", commit_user);
-        return commit_user;
+          commit("SIGN_UP", user);
+          dispatch("notification/addNoti", commit_noti, { root: true }).then(
+            () => {
+              return user;
+            }
+          );
+        }
+        //*if new user=> store the info from google sign in to database
+        else {
+          //*format the user with Factory pattern
+          const user = UserFactory.create(sign_res.user);
+          return userServices.addUserInfo({ ...user }).then(() => {
+            //*Noti
+            const id = uniqueId.uniqueId();
+            const commit_noti = {
+              type: "success",
+              id: id,
+              message: `Account Created`,
+            };
+
+            commit("SIGN_UP", user);
+            dispatch("notification/addNoti", commit_noti, { root: true }).then(
+              () => {
+                return user;
+              }
+            );
+          });
+        }
       });
     });
   },

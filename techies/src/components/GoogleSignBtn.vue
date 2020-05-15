@@ -7,7 +7,7 @@
         >Get started to keep in touch with the latest articles</p>
 
         <div>
-          <v-btn outlined color="info" @click="dialog=true">Get Started</v-btn>
+          <v-btn elevation="0" color="info" @click="dialog=true">Get Started</v-btn>
         </div>
       </v-col>
       <v-row justify="center">

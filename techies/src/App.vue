@@ -46,7 +46,8 @@ export default {
           uid: currentUser.uid,
           joined: currentUser.metadata.creationTime
         })
-        .then(() => {
+        .then(res => {
+          console.log("initial user", res);
           this.$router.push({ name: "postsfeed" });
         });
     }
