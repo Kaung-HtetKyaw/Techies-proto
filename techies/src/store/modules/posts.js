@@ -5,7 +5,7 @@ export const namespaced = true;
 export const state = {
   posts: [],
   popularPosts: [],
-  author_profile: {},
+
   author_posts: [],
   post: [],
   lastVisiblePost: {},
@@ -17,6 +17,9 @@ export const mutations = {
   },
   UPDATE_POST(state, payload) {
     state.posts.splice(payload.index, 1, payload.post);
+  },
+  DELETE_POST(state, posts) {
+    state.posts = posts;
   },
   SET_POSTS(state, posts) {
     state.posts = posts;
@@ -32,9 +35,8 @@ export const mutations = {
       state.posts.push(post);
     });
   },
-  SET_AUTHOR_PROFILE(state, profile) {
-    state.author_profile = profile.author;
-    state.author_posts = profile.posts;
+  SET_AUTHOR_POSTS(state, posts) {
+    state.author_posts = posts;
   },
   SET_EMPTY_POST(state, empty) {
     state.isEmpty = empty;
@@ -108,13 +110,13 @@ export const actions = {
   fetchUserPosts({ commit }, uid) {
     let posts = [];
     return postServices.fetchUserPosts(uid).then((response) => {
-      commit("SET_AUTHOR_PROFILE", response);
-
       //*format the post with Factory pattern
       response.docs.forEach((post) => {
         const factoryPost = PostFactory.createFromDB(post);
         posts.push(factoryPost);
       });
+      console.log("set author profile", posts);
+      commit("SET_AUTHOR_POSTS", posts);
       return { posts };
     });
   },
@@ -189,6 +191,26 @@ export const actions = {
       return post;
     });
   },
+  deletePost({ commit, getters, dispatch }, postid) {
+    return postServices.deletePost(postid).then(() => {
+      //*Noti
+      const id = uniqueId.uniqueId();
+      const commit_noti = {
+        type: "success",
+        id: id,
+        message: "Post Deleted",
+      };
+
+      dispatch("notification/addNoti", commit_noti, { root: true }).then(() => {
+        const postsByNotID = getters.getPostByNotID(postid);
+        commit("DELETE_POST", postsByNotID);
+        const postsByID = getters.getPostByID(postid);
+        commit("SET_AUTHOR_POSTS", postsByID);
+        console.log("post deleted");
+        return { postsByNotID, postsByID };
+      });
+    });
+  },
 };
 export const getters = {
   getPostByID: (state) => (id) => {
@@ -199,6 +221,11 @@ export const getters = {
   getPostIndex: (state) => (id) => {
     return state.posts.findIndex((post) => {
       return post.postid === id;
+    });
+  },
+  getPostByNotID: (state) => (id) => {
+    return state.posts.filter((post) => {
+      return post.postid !== id;
     });
   },
 };

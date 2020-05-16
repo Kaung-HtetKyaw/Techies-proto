@@ -60,4 +60,11 @@ export default {
       .doc(id)
       .set(post);
   },
+  deletePost(id) {
+    return firebase
+      .firestore()
+      .collection("posts")
+      .doc(id)
+      .delete();
+  },
 };

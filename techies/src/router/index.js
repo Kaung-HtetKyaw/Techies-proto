@@ -2,14 +2,21 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "@/views/Home.vue";
 import PostsFeed from "../views/PostsFeed.vue";
-import SigIn from "@/views/SignIn.vue";
-import SignUp from "@/views/SignUp.vue";
-import CreatePost from "@/views/CreatePost.vue";
-import PostShow from "@/views/PostShow.vue";
-import EditPost from "@/views/EditPost.vue";
-import NotFound from "@/components/404.vue";
-import User from "@/views/User.vue";
-import UpdateProfile from "@/views/UpdateProfile.vue";
+const SignIn = () =>
+  import(/* webpackChunkName: "signin" */ "@/views/SignIn.vue");
+const SignUp = () =>
+  import(/* webpackChunkName: "signup" */ "@/views/SignUp.vue");
+const CreatePost = () =>
+  import(/* webpackChunkName: "create" */ "@/views/CreatePost.vue");
+const PostShow = () =>
+  import(/* webpackChunkName: "postshow" */ "@/views/PostShow.vue");
+const EditPost = () =>
+  import(/* webpackChunkName: "edit" */ "@/views/EditPost.vue");
+const NotFound = () =>
+  import(/* webpackChunkName: "notfound" */ "@/components/404.vue");
+const User = () => import(/* webpackChunkName: "user" */ "@/views/User.vue");
+const UpdateProfile = () =>
+  import(/* webpackChunkName: "updateprofile" */ "@/views/UpdateProfile.vue");
 import NProgress from "nprogress";
 import store from "@/store/index.js";
 
@@ -33,7 +40,7 @@ const routes = [
   {
     path: "/login",
     name: "login",
-    component: SigIn,
+    component: SignIn,
     beforeEnter(to, from, next) {
       if (store.state.user.user) {
         next({ name: "postsfeed" });

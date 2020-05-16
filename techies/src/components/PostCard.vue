@@ -26,7 +26,7 @@
       <v-card-actions class="py-0">
         <v-container class="py-0 px-0">
           <v-row dense class="d-flex">
-            <v-col cols="12" sm="12" md="7" class="justify-center align-center">
+            <v-col cols="12" sm="12" md="6" class="justify-center align-center">
               <v-container class="py-0">
                 <v-row dense class="d-flex flex-row align-center">
                   <router-link :to="{name:'user',params:{id:post.uid}}" class="router-link">
@@ -56,28 +56,32 @@
             <v-col
               cols="12"
               sm="12"
-              md="5"
+              md="6"
               class="d-flex justify-sm-start justify-md-end align-center"
             >
-              <div>
+              <div class="pr-2">
                 <v-btn icon color="pink">
                   <v-icon>mdi-heart</v-icon>
                 </v-btn>
                 <span class="subheading mr-2">{{post.likes.length}}</span>
               </div>
 
-              <div>
+              <div class="pr-2">
                 <v-btn icon color="info">
                   <v-icon>mdi-bookmark-outline</v-icon>
                 </v-btn>
               </div>
 
-              <div v-if="post.uid===user.uid">
+              <div v-if="post.uid===user.uid" class="pr-2">
                 <router-link :to="{name:'edit',params:{id:post.postid}}" class="router-link">
                   <v-btn icon color="info">
                     <v-icon>mdi-pencil-circle-outline</v-icon>
                   </v-btn>
                 </router-link>
+              </div>
+
+              <div>
+                <DeletePost :postid="post.postid" />
               </div>
             </v-col>
           </v-row>
@@ -90,7 +94,11 @@
 
 <script>
 import { mapState } from "vuex";
+import DeletePost from "@/components/DeletePost.vue";
 export default {
+  components: {
+    DeletePost
+  },
   props: {
     post: {
       type: Object,

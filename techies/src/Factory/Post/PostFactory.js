@@ -18,7 +18,7 @@ class PostFactory {
       likes: object.data().likes,
       likesNo: object.data().likesNo,
       readTime: object.data().readTime,
-      tags: object.data().readTime,
+      tags: object.data().tags,
     };
     return new Post(preparedPost);
   }

@@ -29,6 +29,7 @@
                         <span class="font-weight-bold">{{posts.length}}</span>
                         {{posts.length>1?'posts':'post'}} in total
                       </h5>
+                      <router-link :to="{name:'updateprofile'}"></router-link>
                       <v-btn
                         v-if="author.uid===user.uid"
                         small
