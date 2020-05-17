@@ -6,16 +6,18 @@
       <v-toolbar-title>Techies</v-toolbar-title>
       <v-spacer></v-spacer>
       <span class="mr-0 mr-md-12" v-if="!!user">
-        <v-btn icon class="mx-4 d-none d-md-inline-block">
-          <v-badge
-            v-if="user.readingLists.length>0"
-            :content="user.readingLists.length"
-            :value="user.readingLists.length"
-            color="pink"
-          >
+        <router-link :to="{name:'readinglists'}" class="router-link">
+          <v-btn icon class="mx-4 d-none d-md-inline-block">
             <v-icon>mdi-bookmark-multiple-outline</v-icon>
-          </v-badge>
-        </v-btn>
+            <v-badge
+              class="px-1"
+              v-if="user.readingLists.length>0"
+              :content="user.readingLists.length"
+              :value="user.readingLists.length"
+              color="pink"
+            ></v-badge>
+          </v-btn>
+        </router-link>
 
         <v-btn icon>
           <Dropdown :user="user" />
@@ -79,6 +81,7 @@
                   <v-icon>mdi-bookmark-multiple-outline</v-icon>
                 </v-list-item-icon>
                 <v-list-item-title>
+                  Reading Lists
                   <v-badge
                     class="my-0"
                     inline
@@ -86,7 +89,7 @@
                     :content="user.readingLists.length"
                     :value="user.readingLists.length"
                     color="pink"
-                  >Reading Lists</v-badge>
+                  ></v-badge>
                 </v-list-item-title>
               </v-list-item>
             </router-link>
@@ -170,5 +173,8 @@ export default {
 <style scoped>
 .border-bottom-black {
   border-bottom: 1px solid black !important;
+}
+.serif {
+  font-family: serif;
 }
 </style>

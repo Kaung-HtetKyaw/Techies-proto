@@ -7,6 +7,7 @@ export const state = {
   photoURL: null,
   log_in: false,
   author: {},
+
   categories: [
     "Future",
     "Technology",
@@ -52,6 +53,9 @@ export const mutations = {
   },
   UPLOAD_IMAGE(state, url) {
     state.photoURL = url;
+  },
+  SET_READING_LIST(state, readingList) {
+    state.user.readingLists = readingList;
   },
 };
 export const actions = {
@@ -103,6 +107,7 @@ export const actions = {
 
             commit("LOG_IN", db_user);
             commit("SET_AUTH_STATE", true);
+            //*Noti&
             const id = uniqueId.uniqueId();
             const commit_noti = {
               type: "success",
@@ -149,6 +154,8 @@ export const actions = {
         else {
           //*format the user with Factory pattern
           const user = UserFactory.create(sign_res.user);
+          console.log("response user", sign_res.user);
+          console.log("user sign in info", user);
           return userServices.addUserInfo({ ...user }).then(() => {
             //*Noti
             const id = uniqueId.uniqueId();
@@ -199,5 +206,33 @@ export const actions = {
       dispatch("notification/addNoti", commit_noti, { root: true });
     });
   },
+  addToBookMark({ state, commit }, postid) {
+    let user = state.user;
+    //*push postid to current user readinglists array
+    user.readingLists.push(postid);
+
+    //*update the post in database
+    return userServices.addUserInfo({ ...user }).then(() => {
+      console.log("user reading lists changed", user);
+      commit("SET_READING_LIST", user.readingLists);
+    });
+  },
+  removeFromBookMark({ state, commit }, postid) {
+    let user = state.user;
+    //* make array that dont include postid
+    const readingList = deleteItemFromArray(user.readingLists, postid);
+    //* overwrite the existing readinglist with new readinglist
+    user.readingLists = readingList;
+    //*update the user in database
+    return userServices.addUserInfo({ ...user }).then(() => {
+      console.log("user reading lists changed", user);
+      commit("SET_READING_LIST", user.readingLists);
+    });
+  },
 };
+function deleteItemFromArray(array, item) {
+  return array.filter((el) => {
+    return el !== item;
+  });
+}
 export const getters = {};

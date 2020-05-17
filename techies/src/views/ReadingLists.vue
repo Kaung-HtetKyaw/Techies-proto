@@ -4,7 +4,7 @@
       <v-row dense>
         <v-col cols="12" sm="12" md="8" class="my-12">
           <div>
-            <h1 class="display-1">Reading List</h1>
+            <h1 class="headline">Reading List</h1>
           </div>
           <v-divider class="my-4"></v-divider>
           <div>
@@ -17,7 +17,7 @@
                   cols="12"
                   sm="12"
                   md="8"
-                  class="d-flex flex-column justify-center align-start"
+                  class="d-flex flex-column justify-center align-center align-md-start"
                 >
                   <div class="opacity7 subtitle-1">
                     <p>You haven't save anything yet.</p>
@@ -27,7 +27,9 @@
                     </p>
                   </div>
                   <div class="my-4 d-flex justify-sm-center justify-md-start">
-                    <v-btn small elevation="0" color="info">Posts worth saving</v-btn>
+                    <router-link :to="{name:'postsfeed'}" class="router-link">
+                      <v-btn small elevation="0" color="info">Posts worth saving</v-btn>
+                    </router-link>
                   </div>
                 </v-col>
               </v-row>
@@ -53,6 +55,9 @@ import { mapState } from "vuex";
 export default {
   components: {
     PostCard
+  },
+  created() {
+    console.log("reading list", this.us);
   },
   computed: {
     ...mapState({

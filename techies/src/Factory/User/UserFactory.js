@@ -15,7 +15,9 @@ class UserFactory {
       tags: object.data().tags,
       joined: object.data().joined,
       uid: object.data().uid,
-      readingLists: object.data().readingLists,
+      readingLists: object.data().readingLists
+        ? object.data().readingLists
+        : [],
     };
     return new User(preparedPost);
   }

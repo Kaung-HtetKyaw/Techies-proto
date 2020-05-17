@@ -1,6 +1,8 @@
 import postServices from "@/services/posts.js";
+import userAuth from "@/services/userAuth.js";
 import uniqueId from "@/services/uniqueId.js";
 import PostFactory from "@/Factory/Post/PostFactory.js";
+import UserFactory from "@/Factory/User/UserFactory.js";
 export const namespaced = true;
 export const state = {
   posts: [],
@@ -41,11 +43,18 @@ export const mutations = {
   SET_AUTHOR_POSTS(state, posts) {
     state.author_posts = posts;
   },
+  SET_LIKE(state, post) {
+    state.likes = post;
+  },
   SET_EMPTY_POST(state, empty) {
     state.isEmpty = empty;
   },
 };
-
+function deleteItemFromArray(array, item) {
+  return array.filter((el) => {
+    return el !== item;
+  });
+}
 export const actions = {
   fetchPosts({ commit, state }) {
     //* initialize the posts array
@@ -142,11 +151,13 @@ export const actions = {
         readingLists.push(getPostByID);
       } else {
         postServices.fetchPost(postid).then((response) => {
-          const factoryPost = PostFactory.createFromDB(response);
-          let post = {
-            ...factoryPost,
-          };
-          readingLists.push(post);
+          if (response.data()) {
+            const factoryPost = PostFactory.createFromDB(response);
+            let post = {
+              ...factoryPost,
+            };
+            readingLists.push(post);
+          }
         });
       }
     });
@@ -214,27 +225,71 @@ export const actions = {
       return post;
     });
   },
-  deletePost({ commit, getters, dispatch }, postid) {
-    return postServices.deletePost(postid).then(() => {
-      //*Noti
-      const id = uniqueId.uniqueId();
-      const commit_noti = {
-        type: "success",
-        id: id,
-        message: "Post Deleted",
-      };
 
-      dispatch("notification/addNoti", commit_noti, { root: true }).then(() => {
-        const postsByNotID = getters.getPostByNotID(postid);
-        commit("DELETE_POST", postsByNotID);
-        const postsByID = getters.getPostByID(postid);
-        commit("SET_AUTHOR_POSTS", postsByID);
-        console.log("post deleted");
-        return { postsByNotID, postsByID };
+  deletePost({ commit, getters, dispatch }, postid) {
+    return userAuth.getUserByReadingList(postid).then((users) => {
+      users.docs.forEach((user) => {
+        //*format the user with User Factory
+        let db_user = UserFactory.createFromDB(user);
+
+        db_user.readingLists = deleteItemFromArray(
+          db_user.readingLists,
+          postid
+        );
+
+        userAuth.addUserInfo({ ...db_user });
+      });
+
+      return postServices.deletePost(postid).then(() => {
+        //*Noti
+        const id = uniqueId.uniqueId();
+        const commit_noti = {
+          type: "success",
+          id: id,
+          message: "Post Deleted",
+        };
+
+        dispatch("notification/addNoti", commit_noti, { root: true }).then(
+          () => {
+            const postsByNotID = getters.getPostByNotID(postid);
+            commit("DELETE_POST", postsByNotID);
+            const postsByID = getters.getPostByID(postid);
+            commit("SET_AUTHOR_POSTS", postsByID);
+            console.log("post deleted");
+            return { postsByNotID, postsByID };
+          }
+        );
       });
     });
   },
+  likePost({ commit, getters }, { postid, uid }) {
+    //*get the post from local store by postid
+    const post = getters.getPostByID(postid);
+
+    //*push the like uid to the post likes array
+    post.likes.push(uid);
+    //* increment the likesNo in post
+    post.likesNo++;
+    //*update the post in database
+    return postServices.updatePost(postid, { ...post }).then(() => {
+      commit("SET_LIKE", post);
+    });
+  },
+  unlikePost({ commit, getters }, { postid, uid }) {
+    //*get the post from local store by postid
+    const post = getters.getPostByID(postid);
+
+    //*make array that dont include uid
+    const postLikes = deleteItemFromArray(post.likes, uid);
+    //*overwirte the existing likes with new likes
+    post.likes = postLikes;
+    //*update the post in database
+    return postServices.updatePost(postid, { ...post }).then(() => {
+      commit("SET_LIKE", post);
+    });
+  },
 };
+
 export const getters = {
   getPostByID: (state) => (id) => {
     return state.posts.find((post) => {

@@ -9,6 +9,6 @@ export default class User {
       (this.tags = object.tags ? object.tags : []),
       (this.photoURL = object.photoURL),
       (this.uid = object.uid);
-    this.readingLists = object.readingLists;
+    this.readingLists = object.readingLists ? object.readingLists : [];
   }
 }
