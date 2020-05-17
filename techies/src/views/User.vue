@@ -29,17 +29,15 @@
                         <span class="font-weight-bold">{{posts.length}}</span>
                         {{posts.length>1?'posts':'post'}} in total
                       </h5>
-                      <router-link :to="{name:'updateprofile'}"></router-link>
-                      <v-btn
+                      <router-link
                         v-if="author.uid===user.uid"
-                        small
-                        tile
-                        outlined
-                        color="white"
-                        class="mt-4"
+                        :to="{name:'updateprofile'}"
+                        class="router-link"
                       >
-                        <v-icon left>mdi-pencil</v-icon>Update Profile
-                      </v-btn>
+                        <v-btn small tile outlined color="white" class="mt-4">
+                          <v-icon left>mdi-pencil</v-icon>Update Profile
+                        </v-btn>
+                      </router-link>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -55,14 +53,36 @@
           <PostCard v-for="post in posts" :key="post.postid" :post="post" />
         </v-col>
       </v-row>
-      <v-row dense v-else class="d-flex flex-column justify-center align-center px-6">
-        <div class="my-2 my-md-4">
-          <v-icon size="50" left>mdi-emoticon-sad-outline</v-icon>
-        </div>
-        <h1 class="headline opacity7 my-4 text-center">Your dont't have any posts yet</h1>
-        <router-link :to="{name:'create'}" class="router-link">
-          <v-btn outlined color="info" rounded>Create Now</v-btn>
-        </router-link>
+
+      <v-row v-else dense class="my-12">
+        <v-col cols="12" sm="12" md="8" offset-md="2">
+          <div>
+            <h1 class="headline text-center text-md-left">Posts by {{author.displayName}}</h1>
+          </div>
+          <v-divider class="my-4"></v-divider>
+          <v-container class="grey lighten-5">
+            <v-row dense>
+              <v-col cols="12" sm="12" md="4" class="d-flex justify-center align-center">
+                <v-img max-width="150" src="@/assets/readinglist.png"></v-img>
+              </v-col>
+              <v-col
+                cols="12"
+                sm="12"
+                md="8"
+                class="d-flex flex-column justify-center align-center align-md-start"
+              >
+                <div class="opacity7 subtitle-1">
+                  <p>You haven't post anything yet.</p>
+                </div>
+                <div class="my-4 d-flex justify-center">
+                  <router-link :to="{name:'create'}" class="router-link">
+                    <v-btn small elevation="0" color="info">Create on Now</v-btn>
+                  </router-link>
+                </div>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-col>
       </v-row>
     </v-container>
   </div>

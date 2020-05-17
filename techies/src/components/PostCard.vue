@@ -1,7 +1,7 @@
 <template>
   <div class="my-6">
     <v-card class="mx-auto" elevation="0" color="#fff py-0">
-      <v-card-title class="py-0 px-0">
+      <v-card-title class="py-0 px-0 d-none d-md-flex">
         <v-chip v-for="tag in post.tags" :key="tag" class="ma-2" outlined>#{{tag}}</v-chip>
       </v-card-title>
 
@@ -10,7 +10,7 @@
           <v-row dense class="d-flex flex-column-reverse flex-md-row">
             <v-col cols="12" sm="12" md="9" class="my-1">
               <router-link :to="{name:'postshow',params:{id:post.postid}}" class="router-link">
-                <h2 class="headline font-weight-medium black--text mb-4 serif">{{post.title}}</h2>
+                <h2 class="title font-weight-medium black--text mb-4 serif">{{post.title}}</h2>
                 <h3
                   class="subtitle-1 black--text font-weight-medium mt-2 opacity7"
                 >{{formattedDescription}}</h3>
@@ -60,18 +60,17 @@
               class="d-flex justify-sm-start justify-md-end align-center"
             >
               <div class="pr-2">
-                <v-btn icon color="pink">
-                  <v-icon>mdi-heart</v-icon>
+                <v-btn icon color="pink" @click="likeOrUnlikePost">
+                  <v-icon v-if="likedPost">mdi-heart</v-icon>
+                  <v-icon v-else>mdi-heart-outline</v-icon>
                 </v-btn>
-                <span class="subheading mr-2">{{post.likes.length}}</span>
+                <span v-if="post.likes.length>0" class="subheading mr-2">{{post.likes.length}}</span>
               </div>
 
               <div class="pr-2">
-                <v-btn icon v-if="addedToReadingList" color="info">
-                  <v-icon>mdi-bookmark</v-icon>
-                </v-btn>
-                <v-btn v-else icon color="info">
-                  <v-icon>mdi-bookmark-outline</v-icon>
+                <v-btn icon color="info" @click="addOrRemoveBookMark">
+                  <v-icon v-if="addedToReadingList">mdi-bookmark</v-icon>
+                  <v-icon v-else>mdi-bookmark-outline</v-icon>
                 </v-btn>
               </div>
 
@@ -97,6 +96,7 @@
 
 <script>
 import { mapState } from "vuex";
+import store from "@/store/index.js";
 const DeletePost = () =>
   import(/* webpackChunkName: "deletepost" */ "@/components/DeletePost.vue");
 export default {
@@ -111,6 +111,38 @@ export default {
   },
   created() {
     console.log("post", this.post);
+  },
+  methods: {
+    addOrRemoveBookMark() {
+      if (!this.addedToReadingList) {
+        store.dispatch("user/addToBookMark", this.post.postid).then(() => {
+          console.log("added to reading list");
+        });
+      } else {
+        store.dispatch("user/removeFromBookMark", this.post.postid).then(() => {
+          console.log("added to reading list");
+        });
+      }
+    },
+    likeOrUnlikePost() {
+      if (!this.likedPost) {
+        const payload = {
+          postid: this.post.postid,
+          uid: this.user.uid
+        };
+        store.dispatch("posts/likePost", payload).then(() => {
+          console.log("liked");
+        });
+      } else {
+        const payload = {
+          postid: this.post.postid,
+          uid: this.user.uid
+        };
+        store.dispatch("posts/unlikePost", payload).then(() => {
+          console.log("unliked");
+        });
+      }
+    }
   },
   computed: {
     ...mapState({
@@ -128,6 +160,10 @@ export default {
       const added = this.user.readingLists.includes(this.post.postid);
       console.log("added", added);
       return added;
+    },
+    likedPost() {
+      const liked = this.post.likes.includes(this.user.uid);
+      return liked;
     }
   }
 };

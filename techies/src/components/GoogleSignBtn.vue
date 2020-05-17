@@ -36,7 +36,7 @@
 
 <script>
 import store from "@/store/index.js";
-import userServices from "@/services/userAuth.js";
+
 export default {
   data() {
     return {
@@ -47,14 +47,10 @@ export default {
   methods: {
     signInWithGoogle() {
       this.loading = true;
-      store.dispatch("user/signInWithGoogle").then(result => {
+      store.dispatch("user/signInWithGoogle").then(() => {
         this.dialog = false;
         this.loading = false;
         this.$router.push({ name: "postsfeed" });
-        console.log("reulst  goo", result.email);
-        console.log("reulst  goo", result.photoURL);
-        console.log("reulst  goo", result.displayName);
-        console.log("cur u", userServices.currentUser());
       });
     }
   }
