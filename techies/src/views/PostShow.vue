@@ -64,10 +64,10 @@
                 </div>
 
                 <div>
-                  <v-btn icon color="info">
-                    <v-icon>mdi-bookmark-outline</v-icon>
+                  <v-btn icon color="info" @click="addOrRemoveBookMark">
+                    <v-icon v-if="addedToReadingList">mdi-bookmark</v-icon>
+                    <v-icon v-else>mdi-bookmark-outline</v-icon>
                   </v-btn>
-                  <span class="subheading">45</span>
                 </div>
               </v-col>
             </v-row>
@@ -93,6 +93,8 @@
 </template>
 
 <script>
+import store from "@/store/index.js";
+import { mapState } from "vuex";
 import CommentContainer from "@/components/CommentContainer.vue";
 export default {
   components: {
@@ -108,10 +110,30 @@ export default {
       required: true
     }
   },
-
+  methods: {
+    addOrRemoveBookMark() {
+      if (!this.addedToReadingList) {
+        store.dispatch("user/addToBookMark", this.post.postid).then(() => {
+          console.log("added to reading list");
+        });
+      } else {
+        store.dispatch("user/removeFromBookMark", this.post.postid).then(() => {
+          console.log("added to reading list");
+        });
+      }
+    }
+  },
   computed: {
+    ...mapState({
+      user: state => state.user.user
+    }),
     formattedContent() {
       return this.post.content.split("\n");
+    },
+    addedToReadingList() {
+      const added = this.user.readingLists.includes(this.post.postid);
+      console.log("added", added);
+      return added;
     }
   }
 };

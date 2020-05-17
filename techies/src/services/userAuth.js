@@ -37,4 +37,11 @@ export default {
       .doc(id)
       .get();
   },
+  getUserByReadingList(readingList) {
+    return firebase
+      .firestore()
+      .collection("users")
+      .where("readingLists", "array-contains", readingList)
+      .get();
+  },
 };
