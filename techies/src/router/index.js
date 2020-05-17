@@ -17,6 +17,8 @@ const NotFound = () =>
 const User = () => import(/* webpackChunkName: "user" */ "@/views/User.vue");
 const UpdateProfile = () =>
   import(/* webpackChunkName: "updateprofile" */ "@/views/UpdateProfile.vue");
+const ReadingLists = () =>
+  import(/* webpackChunkName: "updateprofile" */ "@/views/ReadingLists.vue");
 import NProgress from "nprogress";
 import store from "@/store/index.js";
 
@@ -55,7 +57,7 @@ const routes = [
     component: SignUp,
   },
   {
-    path: "/:id",
+    path: "/p/:id",
     name: "postshow",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
@@ -112,6 +114,17 @@ const routes = [
     path: "/404",
     name: "404",
     component: NotFound,
+  },
+  {
+    path: "/rl",
+    name: "readinglists",
+    component: ReadingLists,
+    beforeEnter(to, from, next) {
+      const lists = store.state.user.user.readingLists;
+      store.dispatch("posts/fetchReadingLists", lists).then(() => {
+        next();
+      });
+    },
   },
   {
     path: "*",

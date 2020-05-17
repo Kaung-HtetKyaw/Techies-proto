@@ -3,6 +3,12 @@ import "firebase/firestore";
 import "firebase/storage";
 
 export default {
+  fetchAllposts() {
+    return firebase
+      .firestore()
+      .collection("posts")
+      .get();
+  },
   fetchPosts() {
     return firebase
       .firestore()

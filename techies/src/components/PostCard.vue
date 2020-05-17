@@ -67,7 +67,10 @@
               </div>
 
               <div class="pr-2">
-                <v-btn icon color="info">
+                <v-btn icon v-if="addedToReadingList" color="info">
+                  <v-icon>mdi-bookmark</v-icon>
+                </v-btn>
+                <v-btn v-else icon color="info">
                   <v-icon>mdi-bookmark-outline</v-icon>
                 </v-btn>
               </div>
@@ -80,7 +83,7 @@
                 </router-link>
               </div>
 
-              <div>
+              <div v-if="post.uid===user.uid" class="pr-2">
                 <DeletePost :postid="post.postid" />
               </div>
             </v-col>
@@ -94,7 +97,8 @@
 
 <script>
 import { mapState } from "vuex";
-import DeletePost from "@/components/DeletePost.vue";
+const DeletePost = () =>
+  import(/* webpackChunkName: "deletepost" */ "@/components/DeletePost.vue");
 export default {
   components: {
     DeletePost
@@ -104,6 +108,9 @@ export default {
       type: Object,
       required: true
     }
+  },
+  created() {
+    console.log("post", this.post);
   },
   computed: {
     ...mapState({
@@ -116,6 +123,11 @@ export default {
         .slice(0, 50)
         .join(" ");
       return desp.length > 50 ? formatted_desp + "...." : formatted_desp;
+    },
+    addedToReadingList() {
+      const added = this.user.readingLists.includes(this.post.postid);
+      console.log("added", added);
+      return added;
     }
   }
 };

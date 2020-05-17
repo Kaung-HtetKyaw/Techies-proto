@@ -4,7 +4,7 @@
       <TheNav />
     </nav>
 
-    <v-content>
+    <v-content class="mt-n2">
       <router-view :key="$route.fullPath"></router-view>
     </v-content>
     <footer>

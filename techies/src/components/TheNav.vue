@@ -1,9 +1,26 @@
 <template>
-  <div>
-    <v-app-bar app color="primary lighten-1" hide-on-scroll dark>
+  <div class="border-bottom-black">
+    <v-app-bar app dark color="primary lighten-1" elevation="3" hide-on-scroll class="pr-6">
       <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
 
       <v-toolbar-title>Techies</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <span class="mr-0 mr-md-12" v-if="!!user">
+        <v-btn icon class="mx-4 d-none d-md-inline-block">
+          <v-badge
+            v-if="user.readingLists.length>0"
+            :content="user.readingLists.length"
+            :value="user.readingLists.length"
+            color="pink"
+          >
+            <v-icon>mdi-bookmark-multiple-outline</v-icon>
+          </v-badge>
+        </v-btn>
+
+        <v-btn icon>
+          <Dropdown :user="user" />
+        </v-btn>
+      </span>
     </v-app-bar>
 
     <v-navigation-drawer app v-model="drawer" fixed temporary>
@@ -21,6 +38,14 @@
         <v-list-item-group active-class="primary--text text--accent-4">
           <!-- Persistent menu -->
           <router-link v-if="!!user" :to="{name:'postsfeed'}" class="router-link">
+            <v-list-item>
+              <v-list-item-icon>
+                <v-icon>mdi-post-outline</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title>Posts feed</v-list-item-title>
+            </v-list-item>
+          </router-link>
+          <router-link v-if="!!user" to="/404" class="router-link">
             <v-list-item>
               <v-list-item-icon>
                 <v-icon>mdi-post-outline</v-icon>
@@ -46,6 +71,26 @@
                 <v-list-item-title>My Posts</v-list-item-title>
               </v-list-item>
             </router-link>
+            <v-divider class="my-2"></v-divider>
+            <!-- Reading lists -->
+            <router-link v-if="!!user" :to="{name:'readinglists'}" class="router-link">
+              <v-list-item>
+                <v-list-item-icon>
+                  <v-icon>mdi-bookmark-multiple-outline</v-icon>
+                </v-list-item-icon>
+                <v-list-item-title>
+                  <v-badge
+                    class="my-0"
+                    inline
+                    v-if="user.readingLists.length>0"
+                    :content="user.readingLists.length"
+                    :value="user.readingLists.length"
+                    color="pink"
+                  >Reading Lists</v-badge>
+                </v-list-item-title>
+              </v-list-item>
+            </router-link>
+
             <!-- User related -->
             <div v-if="!!user">
               <v-divider class="my-2"></v-divider>
@@ -78,12 +123,14 @@ import UserInfo from "@/components/UserAvatarNav.vue";
 import SignOut from "@/components/Signout.vue";
 import GoogleSignIn from "@/components/GoogleSignBtn.vue";
 import { mapState } from "vuex";
-
+const Dropdown = () =>
+  import(/* webpackChunkName: "dropwown" */ "@/components/AvatarDropdown.vue");
 export default {
   components: {
     UserInfo,
     SignOut,
-    GoogleSignIn
+    GoogleSignIn,
+    Dropdown
   },
   data: () => ({
     drawer: false,
@@ -120,3 +167,8 @@ export default {
   }
 };
 </script>
+<style scoped>
+.border-bottom-black {
+  border-bottom: 1px solid black !important;
+}
+</style>

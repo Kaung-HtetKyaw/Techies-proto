@@ -5,7 +5,7 @@ export const namespaced = true;
 export const state = {
   posts: [],
   popularPosts: [],
-
+  readingLists: [],
   author_posts: [],
   post: [],
   lastVisiblePost: {},
@@ -26,6 +26,9 @@ export const mutations = {
   },
   SET_POPULAR_POSTS(state, posts) {
     state.popularPosts = posts;
+  },
+  SET_READING_LISTS(state, posts) {
+    state.readingLists = posts;
   },
   SET_POST(state, post) {
     state.post = post;
@@ -129,6 +132,26 @@ export const actions = {
       commit("SET_POPULAR_POSTS", posts);
       return posts;
     });
+  },
+  fetchReadingLists({ commit, getters }, lists) {
+    let readingLists = [];
+    lists.forEach((postid) => {
+      const getPostByID = getters.getPostByID(postid);
+      if (getPostByID) {
+        console.log("one reading lists getters", getPostByID);
+        readingLists.push(getPostByID);
+      } else {
+        postServices.fetchPost(postid).then((response) => {
+          const factoryPost = PostFactory.createFromDB(response);
+          let post = {
+            ...factoryPost,
+          };
+          readingLists.push(post);
+        });
+      }
+    });
+    commit("SET_READING_LISTS", readingLists);
+    return readingLists;
   },
   createPost({ commit, dispatch }, post) {
     return postServices
