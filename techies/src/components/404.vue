@@ -6,7 +6,7 @@
           <h1 class="display-4 font-weight-bold">404</h1>
         </v-col>
         <v-col cols="12" sm="12" class="d-flex justify-center align-center">
-          <h1 class="display-3 font-weight-bold opacity6">We couldn't find this page</h1>
+          <h1 class="display-3 font-weight-bold opacity6 text-center">We couldn't find this page</h1>
         </v-col>
         <v-col
           cols="12"

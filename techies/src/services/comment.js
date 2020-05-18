@@ -3,6 +3,7 @@ import "firebase/firestore";
 
 export default {
   uploadComment(comment) {
+    console.log("comment db", comment);
     return firebase
       .firestore()
       .collection("comments")
