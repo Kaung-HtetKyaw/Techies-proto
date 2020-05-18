@@ -57,7 +57,7 @@
           </router-link>
           <!-- Logged in menu -->
           <template v-if="!!user">
-            <router-link :to="{name:'create',params:{id:1}}" class="router-link">
+            <router-link :to="{name:'create'}" class="router-link">
               <v-list-item>
                 <v-list-item-icon>
                   <v-icon>mdi-credit-card-check-outline</v-icon>

@@ -5,7 +5,7 @@
     </div>
 
     <div v-else>
-      <h3 class="my-4">Leave a comment</h3>
+      <h3 class="my-4 text-center text-md-left">Leave a comment</h3>
       <v-divider></v-divider>
 
       <v-form
@@ -37,10 +37,36 @@
       </v-form>
       <v-divider class="my-4"></v-divider>
       <div v-if="comments.length>0">
-        <Comment v-for="comment in comments" :key="comment.id" :comment="comment" class="mb-4" />
+        <Comment
+          v-for="comment in comments"
+          :key="comment.id"
+          :comment="comment"
+          :post="post"
+          class="mb-4"
+        />
       </div>
-      <div v-else>
-        <h2>No comments</h2>
+      <div v-else class="grey lighten-5 my-12">
+        <v-row dense>
+          <v-col cols="12" sm="12" md="4" class="d-flex justify-center align-center">
+            <v-img max-width="150" src="@/assets/readinglist.png"></v-img>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="12"
+            md="8"
+            class="d-flex flex-column justify-center align-center align-md-start"
+          >
+            <div class="subtitle-1">
+              <p class="opacity7">This post has no comment yet</p>
+              <div>
+                <v-avatar size="30" class="mr-2">
+                  <img :src="user.photoURL" :alt="user.displayName" />
+                </v-avatar>
+                <span class="opacity7">Be the first to write a comment</span>
+              </div>
+            </div>
+          </v-col>
+        </v-row>
       </div>
     </div>
   </div>
@@ -59,6 +85,10 @@ export default {
     postid: {
       type: String,
       required: true
+    },
+    post: {
+      type: Object,
+      required: true
     }
   },
   data() {
@@ -76,7 +106,7 @@ export default {
   computed: {
     ...mapState({
       user: state => state.user.user,
-      comments: state => state.comment.comments
+      comments: state => state.comment.comments.comments
     })
   },
   created() {
@@ -144,4 +174,10 @@ export default {
 </script>
 
 <style>
+.opacity7 {
+  opacity: 0.7;
+}
+.opacity9 {
+  opacity: 0.9;
+}
 </style>

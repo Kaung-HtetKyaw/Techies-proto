@@ -73,7 +73,7 @@ const routes = [
     },
   },
   {
-    path: "/create/:id",
+    path: "/create",
     name: "create",
     component: CreatePost,
     meta: { requiresAuth: true },
