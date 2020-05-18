@@ -57,10 +57,11 @@
                 class="d-flex flex-row justify-sm-start justify-md-end align-center"
               >
                 <div>
-                  <v-btn icon color="pink">
-                    <v-icon>mdi-heart</v-icon>
+                  <v-btn icon color="pink" @click="likeOrUnlikePost">
+                    <v-icon v-if="likedPost">mdi-heart</v-icon>
+                    <v-icon v-else>mdi-heart-outline</v-icon>
                   </v-btn>
-                  <span class="subheading mr-2">{{post.likes.length}}</span>
+                  <span class="subheading mr-2" v-if="post.likes.length>0">{{post.likes.length}}</span>
                 </div>
 
                 <div>
@@ -85,7 +86,7 @@
       </v-row>
       <v-row dense>
         <v-col cols="12" sm="12" md="8" offset-md="2">
-          <CommentContainer :postid="post.postid" />
+          <CommentContainer :postid="post.postid" :post="post" />
         </v-col>
       </v-row>
     </v-container>
@@ -121,6 +122,26 @@ export default {
           console.log("added to reading list");
         });
       }
+    },
+    likeOrUnlikePost() {
+      console.log("did he like the post", this.likedPost);
+      if (!this.likedPost) {
+        const payload = {
+          postid: this.post.postid,
+          uid: this.user.uid
+        };
+        store.dispatch("posts/likePost", payload).then(() => {
+          console.log("liked");
+        });
+      } else {
+        const payload = {
+          postid: this.post.postid,
+          uid: this.user.uid
+        };
+        store.dispatch("posts/unlikePost", payload).then(() => {
+          console.log("unliked");
+        });
+      }
     }
   },
   computed: {
@@ -134,6 +155,11 @@ export default {
       const added = this.user.readingLists.includes(this.post.postid);
       console.log("added", added);
       return added;
+    },
+    likedPost() {
+      const liked = this.post.likes.includes(this.user.uid);
+      console.log("did he like the post");
+      return liked;
     }
   }
 };

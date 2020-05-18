@@ -125,6 +125,7 @@ export default {
       }
     },
     likeOrUnlikePost() {
+      console.log("did he like the post", this.likedPost);
       if (!this.likedPost) {
         const payload = {
           postid: this.post.postid,
@@ -163,6 +164,7 @@ export default {
     },
     likedPost() {
       const liked = this.post.likes.includes(this.user.uid);
+      console.log("did he like the post");
       return liked;
     }
   }

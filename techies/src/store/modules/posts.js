@@ -13,6 +13,11 @@ export const state = {
   lastVisiblePost: {},
   isEmpty: false,
 };
+function getIndex(posts, post) {
+  return posts.findIndex((el) => {
+    return el.postid === post.postid;
+  });
+}
 export const mutations = {
   CREATE_POST(state, post) {
     state.posts.push(post);
@@ -44,7 +49,10 @@ export const mutations = {
     state.author_posts = posts;
   },
   SET_LIKE(state, post) {
-    state.likes = post;
+    const postIndex = getIndex(state.posts, post);
+    const author_postIndex = getIndex(state.author_posts, post);
+    state.posts.splice(postIndex, 1, post);
+    state.author_posts.splice(author_postIndex, 1, post);
   },
   SET_EMPTY_POST(state, empty) {
     state.isEmpty = empty;
@@ -263,13 +271,15 @@ export const actions = {
     });
   },
   likePost({ commit, getters }, { postid, uid }) {
-    //*get the post from local store by postid
+    //*get the post and author_post(if exist) from local store by postid
     const post = getters.getPostByID(postid);
 
     //*push the like uid to the post likes array
     post.likes.push(uid);
+
+    post.likesNo = post.likes.length;
     //* increment the likesNo in post
-    post.likesNo++;
+
     //*update the post in database
     return postServices.updatePost(postid, { ...post }).then(() => {
       commit("SET_LIKE", post);
@@ -281,8 +291,13 @@ export const actions = {
 
     //*make array that dont include uid
     const postLikes = deleteItemFromArray(post.likes, uid);
+
+    console.log("uid", uid);
+    console.log("array dont have uid", postLikes);
     //*overwirte the existing likes with new likes
     post.likes = postLikes;
+    //*decrement likesNo
+    post.likesNo = post.likes.length;
     //*update the post in database
     return postServices.updatePost(postid, { ...post }).then(() => {
       commit("SET_LIKE", post);
@@ -293,6 +308,16 @@ export const actions = {
 export const getters = {
   getPostByID: (state) => (id) => {
     return state.posts.find((post) => {
+      return post.postid === id;
+    });
+  },
+  getAuthorPostByNotID: (state) => (id) => {
+    return state.author_posts.filter((post) => {
+      return post.postid !== id;
+    });
+  },
+  getAuthorPostByID: (state) => (id) => {
+    return state.author_posts.find((post) => {
       return post.postid === id;
     });
   },
