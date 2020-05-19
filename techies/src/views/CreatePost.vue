@@ -69,7 +69,7 @@
               deletable-chips
               label="Choose tags"
               multiple
-              :rules="selectRules"
+              :rules="postCatRules"
               required
               rounded
             >

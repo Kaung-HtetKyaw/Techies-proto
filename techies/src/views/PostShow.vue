@@ -10,7 +10,15 @@
               </v-col>
             </v-row>
             <v-row dense class="my-4">
-              <v-chip v-for="tag in post.tags" :key="tag" class="ma-2" outlined>#{{tag}}</v-chip>
+              <v-slide-group multiple show-arrows>
+                <v-slide-item
+                  v-slot:default="{ active, toggle }"
+                  v-for="tag in post.tags"
+                  :key="tag"
+                >
+                  <v-chip class="ma-2" outlined :input-value="active" @click="toggle">#{{tag}}</v-chip>
+                </v-slide-item>
+              </v-slide-group>
             </v-row>
             <v-row dense class="my-4">
               <v-col cols="12" sm="12">
@@ -79,6 +87,29 @@
                   v-for="(content,i) in formattedContent"
                   :key="i"
                 >{{content}}</p>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-col>
+      </v-row>
+      <v-row dense>
+        <v-col cols="12" sm="12" md="8" offset-md="2">
+          <v-container>
+            <v-row dense class="d-flex flex-column align-center justify-center">
+              <v-col cols="12" sm="12" md="12" class="d-flex justify-center align-center">
+                <div>
+                  <v-btn x-large icon color="pink" @click="likeOrUnlikePost">
+                    <v-icon v-if="likedPost">mdi-heart</v-icon>
+                    <v-icon v-else>mdi-heart-outline</v-icon>
+                  </v-btn>
+                  <span class="subheading mr-2" v-if="post.likes.length>0">{{post.likes.length}}</span>
+                </div>
+                <div>
+                  <v-btn x-large icon color="info" @click="addOrRemoveBookMark">
+                    <v-icon v-if="addedToReadingList">mdi-bookmark</v-icon>
+                    <v-icon v-else>mdi-bookmark-outline</v-icon>
+                  </v-btn>
+                </div>
               </v-col>
             </v-row>
           </v-container>

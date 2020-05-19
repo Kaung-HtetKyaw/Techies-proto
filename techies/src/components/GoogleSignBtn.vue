@@ -17,11 +17,12 @@
 
             <v-card-text
               class="caption text-center"
-            >Create an account to receive great stories in your inbox, personalize your homepage, and follow authors and topics that you love.</v-card-text>
+            >Create an account to receive great posts in your inbox, and follow authors and topics that you love.</v-card-text>
 
             <v-card-actions class="d-flex flex-column justify-center align-center my-4">
-              <v-btn :loading="loading" outlined @click="signInWithGoogle" class="mb-6">
-                <v-icon size="20" class="px-2">mdi-google</v-icon>Sign In with Google
+              <v-btn :loading="loading" outlined @click="signInWithGoogle" class="mb-6 p-4">
+                <v-img class="mx-1" width="15" src="@/assets/google-icon.svg"></v-img>
+                <span class="caption ml-2">Sign In with Google</span>
               </v-btn>
               <p
                 class="overline text-center my-4 px-4"

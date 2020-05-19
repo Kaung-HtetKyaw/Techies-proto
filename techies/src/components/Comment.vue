@@ -49,7 +49,7 @@
                     </div>
                     <div>
                       <v-menu
-                        close-on-content-click
+                        :close-on-content-click="close_on_content_click"
                         bottom
                         left
                         v-if="comment.author.uid===user.uid||user.uid===post.uid"
@@ -210,7 +210,8 @@ export default {
       edit: true,
       deleteDialog: false,
       loading: false,
-      deleting: false
+      deleting: false,
+      close_on_content_click: true
     };
   },
   created() {

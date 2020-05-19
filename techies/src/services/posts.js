@@ -46,7 +46,7 @@ export default {
     return firebase
       .firestore()
       .collection("posts")
-      .orderBy("likesNo")
+      .orderBy("likesNo", "desc")
       .limit(3)
       .get();
   },

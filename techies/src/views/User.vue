@@ -17,12 +17,12 @@
                       cols="12"
                       sm="12"
                       md="7"
-                      class="d-flex flex-column align-center align-md-start"
+                      class="d-flex flex-column align-center align-md-start px-4 py-4"
                     >
                       <h1 class="display-1 font-weight-medium">{{author.displayName}}</h1>
-                      <h3
-                        class="text-center text-md-left my-2 sibtitle-2 font-weight-medium"
-                      >{{author.bio}}</h3>
+                      <h3 class="text-center text-md-left my-4 sibtitle-2">
+                        <span>{{author.bio}}</span>
+                      </h3>
                       <h5 class="body-2 opacity7 font-weight-medium mb-2">Joined since {{trimTime}}</h5>
 
                       <h5 class="body-2 font-weight-medium opacity9">

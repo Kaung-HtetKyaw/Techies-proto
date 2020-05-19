@@ -45,6 +45,9 @@ export const mutations = {
   SIGN_UP(state, user) {
     state.user = user;
   },
+  UPDATE_PROFILE(state, user) {
+    state.user = user;
+  },
   SIGN_OUT(state, user) {
     state.user = user;
   },
@@ -63,6 +66,8 @@ export const actions = {
     console.log("current user check", user);
     return userServices.fetchUser(user.uid).then((res) => {
       console.log("return user check", res.data());
+      //*add new user property
+
       const commit_user = {
         ...UserFactory.createFromDB(res),
       };
@@ -129,12 +134,17 @@ export const actions = {
   signInWithGoogle({ commit, dispatch }) {
     //*sign in with google
     return userServices.signInWithGoogle().then((sign_res) => {
+      console.log("new user", sign_res);
+      const isNewUser = sign_res.additionalUserInfo.isNewUser;
       //*fetch the user with uid got from google sign in
       return userServices.fetchUser(sign_res.user.uid).then((user_res) => {
         //*if old user=> just fetch it and commit
         if (user_res.data()) {
+          //*add new user property
+          user_res.data().isNewUser = isNewUser;
           //*Format the user with Factory pattern
           const user = UserFactory.createFromDB(user_res);
+
           //*Noti
           const id = uniqueId.uniqueId();
           const commit_noti = {
@@ -152,6 +162,8 @@ export const actions = {
         }
         //*if new user=> store the info from google sign in to database
         else {
+          //*add new user property
+          sign_res.user.isNewUser = isNewUser;
           //*format the user with Factory pattern
           const user = UserFactory.create(sign_res.user);
           console.log("response user", sign_res.user);
@@ -178,16 +190,16 @@ export const actions = {
   },
   updateProfile({ commit, dispatch }, user) {
     //* format user obj to commit obj for excluding password
-
+    console.log("state edit user", user);
     return userServices.addUserInfo(user).then(() => {
       const id = uniqueId.uniqueId();
       const commit_noti = {
         type: "success",
         id: id,
-        message: `Account Created`,
+        message: `Account Updated`,
       };
 
-      commit("SIGN_UP", user);
+      commit("UPDATE_PROFILE", user);
       dispatch("notification/addNoti", commit_noti, { root: true }).then(() => {
         return user;
       });

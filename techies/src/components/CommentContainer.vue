@@ -14,7 +14,7 @@
         lazy-validation
         v-model="valid"
         @submit="uploadComment"
-        @enter="uploadComment"
+        @keydown.enter="uploadComment"
       >
         <v-textarea
           v-model="user_comment"
@@ -74,13 +74,13 @@
 
 <script>
 import { mapState } from "vuex";
-import { uniqueId } from "@/mixins/uniqueId.js";
 import { rules } from "@/mixins/rules.js";
 import { formattedDate } from "@/mixins/util.js";
 import Comment from "@/components/Comment.vue";
 import store from "@/store/index.js";
+
 export default {
-  mixins: [rules, uniqueId, formattedDate],
+  mixins: [rules, formattedDate],
   props: {
     postid: {
       type: String,
@@ -123,14 +123,16 @@ export default {
         let db_comments = [];
 
         //* but stae.comments can't be assigned directly so i push it to a variable
+
         this.comments.forEach(el => {
           db_comments.push(el);
         });
+
         //* and push a comment to upload and make an obj that includes postid and comments array and dispatch it
         db_comments.push({
           date: this.formattedDate,
-          id: this.uniqueId,
-          author: this.user,
+          id: this.uniqueId(),
+          author: { ...this.user },
           message: this.user_comment,
           likes: []
         });
@@ -143,7 +145,7 @@ export default {
           .dispatch("comment/uploadComment", db_comment_obj)
           .then(res => {
             this.valid = true;
-            this.user_comment = "Discuss";
+            this.user_comment = " ";
 
             this.loading = false;
             this.comments.forEach(el => {
@@ -168,6 +170,14 @@ export default {
           this.has_comment = true;
         }
       });
+    },
+    uniqueId() {
+      return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+        (
+          c ^
+          (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+        ).toString(16)
+      );
     }
   }
 };

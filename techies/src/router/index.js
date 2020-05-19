@@ -104,10 +104,9 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: "updateP",
+    path: "/up",
     name: "updateprofile",
     component: UpdateProfile,
-
     meta: { requiresAuth: true },
   },
   {

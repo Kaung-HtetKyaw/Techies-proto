@@ -12,7 +12,7 @@
       <v-card>
         <v-list>
           <router-link :to="{name:'user',params:{id:user.uid}}" class="router-link">
-            <v-list-item>
+            <v-list-item class="d-flex justify-center align-center">
               <v-list-item-avatar>
                 <img :src="user.photoURL" :alt="user.displayName" />
               </v-list-item-avatar>
@@ -37,7 +37,8 @@
           <router-link :to="{name:'updateprofile'}" class="router-link">
             <v-list-item class="d-flex justify-center">
               <v-btn class="black--text opacity7" text block>
-                <v-icon></v-icon>Update Profile
+                Update Profile
+                <v-icon color="error" v-if="user.isNewUser">mdi-exclamation-thick</v-icon>
               </v-btn>
             </v-list-item>
           </router-link>

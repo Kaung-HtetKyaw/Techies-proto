@@ -5,6 +5,7 @@
 
       <v-toolbar-title>Techies</v-toolbar-title>
       <v-spacer></v-spacer>
+
       <span class="mr-0 mr-md-12" v-if="!!user">
         <router-link :to="{name:'readinglists'}" class="router-link">
           <v-btn icon class="mx-4 d-none d-md-inline-block">
@@ -102,7 +103,10 @@
                   <v-list-item-icon>
                     <v-icon>mdi-card-text-outline</v-icon>
                   </v-list-item-icon>
-                  <v-list-item-title>Update Profile</v-list-item-title>
+                  <v-list-item-title>
+                    Update Profile
+                    <v-icon color="error" v-if="user.isNewUser">mdi-exclamation-thick</v-icon>
+                  </v-list-item-title>
                 </v-list-item>
               </router-link>
             </div>

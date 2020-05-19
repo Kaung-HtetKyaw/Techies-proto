@@ -37,6 +37,7 @@ export default {
     const currentUser = userServices.currentUser();
     //* if currentUser available
     //*commit is to the local store and redirect route
+    console.log("WOOWOWOOOOOO", currentUser);
     if (currentUser) {
       store
         .dispatch("user/checkInitialUser", {
@@ -58,5 +59,11 @@ export default {
 .router-link {
   text-decoration: none;
   color: initial;
+}
+.opacity7 {
+  opacity: 0.7;
+}
+.opacity9 {
+  opacity: 0.9;
 }
 </style>

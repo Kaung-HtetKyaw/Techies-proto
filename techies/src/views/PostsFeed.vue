@@ -1,13 +1,13 @@
 <template>
   <div id="PostsFeed">
     <v-container class="py-0">
-      <v-row dense class="d-none d-md-flex flex-column">
-        <v-col cols="12" sm="12" md="8" offset-md="2">
-          <Carousel :posts="popularPosts" />
+      <v-row dense class>
+        <v-col cols="12" sm="12" md="10" offset-md="1">
+          <PopularPosts :posts="popularPosts" />
         </v-col>
       </v-row>
       <v-row dense>
-        <v-col cols="12" sm="12" md="8" offset-md="2">
+        <v-col cols="12" sm="12" md="10" offset-md="1">
           <PostCard v-for="post in posts" :key="post.postid" :post="post" />
         </v-col>
       </v-row>
@@ -29,7 +29,7 @@
 
 <script>
 import PostCard from "@/components/PostCard.vue";
-import Carousel from "@/components/PopularCarousel.vue";
+import PopularPosts from "@/components/PopularPosts.vue";
 
 import store from "@/store/index.js";
 import NProgress from "nprogress";
@@ -42,7 +42,7 @@ export default {
   },
   components: {
     PostCard,
-    Carousel
+    PopularPosts
   },
   beforeRouteEnter(to, from, next) {
     NProgress.start();

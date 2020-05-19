@@ -4,7 +4,7 @@
       <v-row dense>
         <v-col cols="12" sm="12" md="8" class="my-12">
           <div>
-            <h1 class="headline">Reading List</h1>
+            <h1 class="headline text-center text-md-left">Reading List</h1>
           </div>
           <v-divider class="my-4"></v-divider>
           <div>

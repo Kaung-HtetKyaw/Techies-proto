@@ -9,7 +9,7 @@
               <v-form ref="form" class="px-2" v-model="valid" @submit="validate" @enter="validate">
                 <v-text-field
                   type="text"
-                  v-model="displayName"
+                  v-model="user.displayName"
                   :counter="20"
                   :rules="nameRules"
                   label="Name"
@@ -19,7 +19,7 @@
 
                 <v-textarea
                   counter="200"
-                  v-model="bio"
+                  v-model="user.bio"
                   label="Describe yourself"
                   :rules="bioRules"
                   outlined
@@ -27,7 +27,7 @@
                   class="p-0"
                 ></v-textarea>
                 <v-select
-                  v-model="tags"
+                  v-model="user.tags"
                   :items="categories"
                   chips
                   deletable-chips
@@ -41,7 +41,7 @@
                 </v-select>
                 <div class="mb-6">
                   <v-btn
-                    v-if="!imageUrl"
+                    v-if="choose_btn"
                     outlined
                     color="info"
                     rounded
@@ -55,7 +55,7 @@
                     accept="image/*"
                     @change="onFilePicked"
                   />
-                  <v-img v-if="local_imageUrl" :src="local_imageUrl" width="150px" class="my-4"></v-img>
+                  <v-img v-if="getImageUrl" :src="getImageUrl" width="150px" class="my-4"></v-img>
                   <div class="my-4" v-if="upload_btn">
                     <v-btn
                       outlined
@@ -105,12 +105,12 @@ export default {
     valid: true,
     tags: null,
     bio: "",
-
     displayName: "",
     rawFile: null,
     local_imageUrl: null,
     imageUrl: null,
     upload_btn: false,
+    choose_btn: true,
     upload: false,
     upload_finish: false,
     loading: false
@@ -119,21 +119,28 @@ export default {
     ...mapState({
       categories: state => state.user.categories,
       user: state => state.user.user
-    })
+    }),
+    getImageUrl() {
+      return this.local_imageUrl ? this.local_imageUrl : this.user.photoURL;
+    }
   },
 
   methods: {
     validate() {
       this.$refs.form.validate();
+      console.log("user obj", this.user);
       const user = {
         email: this.user.email,
-        displayName: this.displayName,
-        photoURL: this.imageUrl,
-        tags: this.tags,
-        bio: this.bio,
+        displayName: this.user.displayName,
+        photoURL: this.user.photoURL,
+        tags: this.user.tags,
+        bio: this.user.bio,
         uid: this.user.uid,
-        joined: this.user.joined
+        joined: this.user.joined,
+        readingLists: this.user.readingLists,
+        isNewUser: false
       };
+      console.log("eidted user", user);
 
       if (this.valid) {
         this.loading = true;
@@ -142,7 +149,7 @@ export default {
           .then(res => {
             console.log(res);
             this.loading = false;
-            this.$router.push({ name: "postsfeed" });
+            this.$router.push({ name: "user", params: { id: this.user.uid } });
           })
           .catch(error => {
             this.loading = false;
@@ -190,10 +197,12 @@ export default {
         },
         () => {
           storageRef.snapshot.ref.getDownloadURL().then(downloadURL => {
-            this.imageUrl = downloadURL;
+            this.user.photoURL = downloadURL;
+            console.log("this user photourl", this.user);
             this.upload = false;
             this.upload_btn = false;
             this.upload_finish = true;
+            this.choose_btn = false;
           });
         }
       );

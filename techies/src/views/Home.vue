@@ -4,7 +4,7 @@
       <v-row dense>
         <v-col cols="12" sm="12" md="6" class="d-flex flex-column justify-center align-center">
           <h1 class="serif my-6 text-center text-md-left">All that matters to you at your fingertips</h1>
-          <div>
+          <div class="d-none d-md-block">
             <v-chip
               v-for="(category,i) in categories"
               color="info"
@@ -14,7 +14,7 @@
             >#{{category}}</v-chip>
           </div>
         </v-col>
-        <v-col cols="12" sm="12" md="6" class="d-none d-md-flex">
+        <v-col cols="12" sm="12" md="6">
           <v-img src="@/assets/home_hero.png"></v-img>
         </v-col>
       </v-row>

@@ -38,7 +38,14 @@ export const actions = {
         commit("SET_COMMENTS", factoryComment);
         return factoryComment;
       } else {
-        return false;
+        const comment = {
+          postid: postid,
+          comments: [],
+        };
+        return commentServices.uploadComment(comment).then(() => {
+          commit("SET_COMMENTS", comment);
+          return !!comment.comments;
+        });
       }
     });
   },
