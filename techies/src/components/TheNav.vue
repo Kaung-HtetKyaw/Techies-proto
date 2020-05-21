@@ -3,7 +3,13 @@
     <v-app-bar app dark color="primary lighten-1" elevation="3" hide-on-scroll class="pr-6">
       <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
 
-      <v-toolbar-title>Techies</v-toolbar-title>
+      <router-link :to="{name:'postsfeed'}" class="router-link">
+        <v-toolbar-title class="d-flex align-center ml-4">
+          <v-img class="d-inline-block" width="40" src="@/assets/logo.png"></v-img>
+          <span class="mx-2 white--text">Techies</span>
+        </v-toolbar-title>
+      </router-link>
+
       <v-spacer></v-spacer>
 
       <span class="mr-0 mr-md-12" v-if="!!user">
@@ -111,7 +117,9 @@
               </router-link>
             </div>
           </template>
-
+          <template v-if="!!user">
+            <Categories @click="drawer=false" />
+          </template>
           <!-- Logged out menu -->
           <template v-if="!user">
             <GoogleSignIn />
@@ -129,6 +137,7 @@
 import UserInfo from "@/components/UserAvatarNav.vue";
 import SignOut from "@/components/Signout.vue";
 import GoogleSignIn from "@/components/GoogleSignBtn.vue";
+import Categories from "@/components/Categories.vue";
 import { mapState } from "vuex";
 const Dropdown = () =>
   import(/* webpackChunkName: "dropwown" */ "@/components/AvatarDropdown.vue");
@@ -137,7 +146,8 @@ export default {
     UserInfo,
     SignOut,
     GoogleSignIn,
-    Dropdown
+    Dropdown,
+    Categories
   },
   data: () => ({
     drawer: false,
