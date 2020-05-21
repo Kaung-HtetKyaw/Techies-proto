@@ -14,6 +14,11 @@
         </v-list-item-content>
       </template>
 
+      <v-list-item @click="fetchAllPosts">
+        <v-list-item-content>
+          <v-list-item-title>All Posts</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
       <v-list-item v-for="(subItem,i) in item.items" :key="i" @click="fetchTagPost(subItem)">
         <v-list-item-content>
           <v-list-item-title>{{subItem}}</v-list-item-title>
@@ -105,6 +110,17 @@ export default {
       this.dialog = true;
       this.selectedCategory = tag;
       store.dispatch("posts/fetchTagPosts", tag).then(posts => {
+        this.posts = posts;
+        posts.length > 0
+          ? (this.noPostDialog = false)
+          : (this.noPostDialog = true);
+        this.dialog = false;
+        console.log("cat posts", posts);
+      });
+    },
+    fetchAllPosts() {
+      this.dialog = true;
+      store.dispatch("posts/fetchPosts").then(posts => {
         this.posts = posts;
         posts.length > 0
           ? (this.noPostDialog = false)

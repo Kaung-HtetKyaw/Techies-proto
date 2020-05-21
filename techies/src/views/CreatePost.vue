@@ -150,7 +150,7 @@ export default {
       const post = {
         title: this.title,
         description: this.description,
-        author: this.user,
+        author: { ...this.user },
         content: this.content,
         image: this.imageUrl,
         date: this.formattedDate,

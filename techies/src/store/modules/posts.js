@@ -96,25 +96,35 @@ export const actions = {
   },
   fetchTagPosts({ commit }, tag) {
     //*set the filter to true for categories fetch
+    //*for differentiate between normal category fetch and infinit scroll fetch
     commit("SET_FILTER", true);
+    //*initialize an empty array
     let posts = [];
+    //*fetch the posts that have this tag
     return postServices
       .fetchTagPosts(tag)
       .then((response) => {
+        //*format each posts with Post Factory
         response.docs.forEach((post) => {
           //* format posts with Factory pattern
           const factoryPost = PostFactory.createFromDB(post);
           posts.push(factoryPost);
         });
+        //*only overwrite the local posts array if there is one post at least
+        if (posts.length > 0) {
+          commit("SET_POSTS", posts);
+        }
 
-        commit("SET_POSTS", posts);
         return posts;
       })
       .catch((error) => console.log(error));
   },
   fetchMorePosts({ commit, state }) {
+    //*fetch the posts by passing the lastvisible post as an argument
     const db_response = postServices.fetchMorePosts(state.lastVisiblePost);
+    //*initialize an empty array
     let posts = [];
+    //*the database still has posts
     if (db_response) {
       return db_response.then((response) => {
         //*set the latest visible post for later fetch
@@ -134,10 +144,15 @@ export const actions = {
   fetchPost({ commit, getters }, id) {
     //*check the post with payload id already exist?
     const existed_post = getters.getPostByID(id);
+    //*if the post is already existed in local store
     if (existed_post) {
       commit("SET_POST", existed_post);
       return existed_post;
-    } else {
+    }
+
+    //*if the post is not in local store
+    else {
+      //*fetch it from the database
       return postServices
         .fetchPost(id)
         .then((response) => {
@@ -153,7 +168,9 @@ export const actions = {
     }
   },
   fetchUserPosts({ commit }, uid) {
+    //*initialize an empty array
     let posts = [];
+    //*fetch the posts which have this  uid
     return postServices.fetchUserPosts(uid).then((response) => {
       //*format the post with Factory pattern
       response.docs.forEach((post) => {
@@ -166,8 +183,11 @@ export const actions = {
     });
   },
   fetchPopularPosts({ commit }) {
+    //*initialize an empty array
     let posts = [];
+    //*fetch the popular which are the 3 posts with max likesNo
     return postServices.fetchPopularPosts().then((res) => {
+      //*format each post with Post factory
       res.docs.forEach((el) => {
         posts.push(PostFactory.createFromDB(el));
       });
@@ -176,13 +196,21 @@ export const actions = {
     });
   },
   fetchReadingLists({ commit, getters }, lists) {
+    //*initialize an empty array
     let readingLists = [];
+    //*iterate each list
     lists.forEach((postid) => {
+      //*get the post which has this postid
       const getPostByID = getters.getPostByID(postid);
+      //*if this post which has this postid is already in local store
+      //*push it to the empty array
       if (getPostByID) {
         console.log("one reading lists getters", getPostByID);
         readingLists.push(getPostByID);
-      } else {
+      }
+      //*if dont find the post by this postid
+      else {
+        //*fetch it from the database
         postServices.fetchPost(postid).then((response) => {
           if (response.data()) {
             const factoryPost = PostFactory.createFromDB(response);
@@ -198,14 +226,16 @@ export const actions = {
     return readingLists;
   },
   createPost({ commit, dispatch }, post) {
+    //*create it in the database first
     return postServices
       .createPost(post)
       .then((response) => {
-        //*format the response to commit
+        //*format the response with Post Factory
         const commit_post = {
           postid: response.id,
           ...PostFactory.create(post),
         };
+        //*Noti
         const id = uniqueId.uniqueId();
         const commit_noti = {
           type: "success",
@@ -215,6 +245,7 @@ export const actions = {
 
         dispatch("notification/addNoti", commit_noti, { root: true }).then(
           () => {
+            //*push it to the local posts
             commit("CREATE_POST", commit_post);
           }
         );
@@ -234,18 +265,20 @@ export const actions = {
       });
   },
   updatePost({ commit, getters, dispatch }, post) {
-    console.log("lau modue", post);
     //* firebase wont accept custom object(Post object in this case)
     //*so it should be destructured
     const db_post = {
       ...PostFactory.create(post.post),
     };
+    //*prepare obj to commit
     const index = getters.getPostIndex(post.postid);
     const commit_post = {
       index: index,
       post: db_post,
     };
+    //*update it in the database first
     return postServices.updatePost(post.postid, db_post).then(() => {
+      //*then update it in the local store
       commit("UPDATE_POST", commit_post);
       //*Noti
       const id = uniqueId.uniqueId();
@@ -263,13 +296,15 @@ export const actions = {
   deletePost({ commit, getters, dispatch }, postid) {
     console.log("DELETING POSTS THAT ARE IN READING LISTS");
 
+    //*retrive users who have added this postid in their readinglists
     return userAuth.getUserByReadingList(postid).then((users) => {
-      //*delete post from users reading list
+      //*delete post from users reading list which is equal to this postid
       users.docs.forEach((user) => {
         //*format the user with User Factory
         let db_user = UserFactory.createFromDB(user);
         console.log("USERS", user);
         console.log("DELETED POSTID", postid);
+        //*overwrite the existing reading list with reading list which dont have this postid
         db_user.readingLists = deleteItemFromArray(
           db_user.readingLists,
           postid
@@ -277,11 +312,14 @@ export const actions = {
 
         console.log("DB USER", db_user);
         console.log("NEW READING LISTS", db_user.readingLists);
-
+        //*update this user  in the database
         userAuth.addUserInfo({ ...db_user });
       });
 
+      //*delete post in firebase
       return postServices.deletePost(postid).then(() => {
+        //*delete the entire comment doc which has this postid
+        dispatch("comment/deleteCommentDoc", postid, { root: true });
         //*Noti
         const id = uniqueId.uniqueId();
         const commit_noti = {
@@ -289,16 +327,20 @@ export const actions = {
           id: id,
           message: "Post Deleted",
         };
-
+        //*show noti
         dispatch("notification/addNoti", commit_noti, { root: true });
+        //*get posts which dont have this postid
         const postsByNotID = getters.getPostByNotID(postid);
+        //*replace the local posts with the above posts
         commit("DELETE_POST", postsByNotID);
+        //*get posts which  have this postid
         const postsByID = getters.getPostByID(postid);
         commit("SET_AUTHOR_POSTS", postsByID);
-        //*remove post from local store
+        //*get reading list which is not this postid
         let local_readingLists = getters.getReadingListByNotID(postid);
+        //*overwrite the local readinglists
         commit("SET_READING_LISTS", local_readingLists);
-        console.log("post deleted");
+        //*return for later user
         return { postsByNotID, postsByID, local_readingLists };
       });
     });
@@ -306,13 +348,10 @@ export const actions = {
   likePost({ commit, getters }, { postid, uid }) {
     //*get the post and author_post(if exist) from local store by postid
     const post = getters.getPostByID(postid);
-
     //*push the like uid to the post likes array
     post.likes.push(uid);
-
-    post.likesNo = post.likes.length;
     //* increment the likesNo in post
-
+    post.likesNo = post.likes.length;
     //*update the post in database
     return postServices.updatePost(postid, { ...post }).then(() => {
       commit("SET_LIKE", post);
@@ -321,15 +360,11 @@ export const actions = {
   unlikePost({ commit, getters }, { postid, uid }) {
     //*get the post from local store by postid
     const post = getters.getPostByID(postid);
-
     //*make array that dont include uid
     const postLikes = deleteItemFromArray(post.likes, uid);
-
-    console.log("uid", uid);
-    console.log("array dont have uid", postLikes);
     //*overwirte the existing likes with new likes
     post.likes = postLikes;
-    //*decrement likesNo
+    //*overwrite the likeNo
     post.likesNo = post.likes.length;
     //*update the post in database
     return postServices.updatePost(postid, { ...post }).then(() => {
