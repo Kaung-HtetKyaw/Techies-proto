@@ -42,6 +42,9 @@ export const mutations = {
   LOG_IN(state, user) {
     state.user = user;
   },
+  UPDATE_LOCAL_USER(state, user) {
+    state.user = user;
+  },
   SIGN_UP(state, user) {
     state.user = user;
   },
@@ -187,6 +190,9 @@ export const actions = {
         }
       });
     });
+  },
+  updateLocalUser({ commit }, user) {
+    commit("UPDATE_LOCAL_USER", user);
   },
   updateProfile({ commit, dispatch }, user) {
     //* format user obj to commit obj for excluding password

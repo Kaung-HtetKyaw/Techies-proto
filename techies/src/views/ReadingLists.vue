@@ -34,7 +34,7 @@
                 </v-col>
               </v-row>
             </v-container>
-            <v-container>
+            <v-container v-else>
               <v-row dense v-for="post in readingLists" :key="post.postid">
                 <v-col cols="12" sm="12">
                   <PostCard :post="post" />

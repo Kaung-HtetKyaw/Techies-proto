@@ -46,7 +46,9 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     NProgress.start();
-    store.dispatch("posts/fetchPosts").then(response => {
+    const tags = store.state.user.user.tags;
+    console.log("tags", tags);
+    store.dispatch("posts/fetchPosts", tags).then(response => {
       store.dispatch("posts/fetchPopularPosts").then(() => {
         NProgress.done();
         console.log(response);
@@ -59,7 +61,8 @@ export default {
     ...mapState({
       posts: state => state.posts.posts,
       empty: state => state.posts.isEmpty,
-      popularPosts: state => state.posts.popularPosts
+      popularPosts: state => state.posts.popularPosts,
+      filter: state => state.posts.filter
     })
   },
   created() {
@@ -73,17 +76,19 @@ export default {
           document.documentElement.offsetHeight;
 
         if (bottomOfWindow) {
-          if (!this.loading) {
-            if (!this.empty) {
-              this.loading = true;
-              store
-                .dispatch("posts/fetchMorePosts")
-                .then(() => {
-                  this.loading = false;
-                })
-                .catch(() => {
-                  this.loading = false;
-                });
+          if (!this.filter) {
+            if (!this.loading) {
+              if (!this.empty) {
+                this.loading = true;
+                store
+                  .dispatch("posts/fetchMorePosts")
+                  .then(() => {
+                    this.loading = false;
+                  })
+                  .catch(() => {
+                    this.loading = false;
+                  });
+              }
             }
           }
         }

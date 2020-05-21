@@ -11,6 +11,7 @@ export const state = {
   author_posts: [],
   post: [],
   lastVisiblePost: {},
+  filter: false,
   isEmpty: false,
 };
 function getIndex(posts, post) {
@@ -33,6 +34,9 @@ export const mutations = {
   },
   SET_POPULAR_POSTS(state, posts) {
     state.popularPosts = posts;
+  },
+  SET_FILTER(state, condition) {
+    state.filter = condition;
   },
   SET_READING_LISTS(state, posts) {
     state.readingLists = posts;
@@ -65,11 +69,14 @@ function deleteItemFromArray(array, item) {
 }
 export const actions = {
   fetchPosts({ commit, state }) {
+    //*set the filter to flase for all posts fetch
+    commit("SET_FILTER", false);
     //* initialize the posts array
     let posts = [];
     //*reach out to the server
+
     return postServices
-      .fetchPosts()
+      .fetchAllPosts()
       .then((response) => {
         //*set last posts scrolled for infinite scrolling
         state.lastVisiblePost = response.docs[response.docs.length - 1];
@@ -83,6 +90,24 @@ export const actions = {
         commit("SET_POSTS", posts);
         commit("SET_EMPTY_POST", false);
 
+        return posts;
+      })
+      .catch((error) => console.log(error));
+  },
+  fetchTagPosts({ commit }, tag) {
+    //*set the filter to true for categories fetch
+    commit("SET_FILTER", true);
+    let posts = [];
+    return postServices
+      .fetchTagPosts(tag)
+      .then((response) => {
+        response.docs.forEach((post) => {
+          //* format posts with Factory pattern
+          const factoryPost = PostFactory.createFromDB(post);
+          posts.push(factoryPost);
+        });
+
+        commit("SET_POSTS", posts);
         return posts;
       })
       .catch((error) => console.log(error));
@@ -209,6 +234,7 @@ export const actions = {
       });
   },
   updatePost({ commit, getters, dispatch }, post) {
+    console.log("lau modue", post);
     //* firebase wont accept custom object(Post object in this case)
     //*so it should be destructured
     const db_post = {
@@ -235,15 +261,22 @@ export const actions = {
   },
 
   deletePost({ commit, getters, dispatch }, postid) {
+    console.log("DELETING POSTS THAT ARE IN READING LISTS");
+
     return userAuth.getUserByReadingList(postid).then((users) => {
+      //*delete post from users reading list
       users.docs.forEach((user) => {
         //*format the user with User Factory
         let db_user = UserFactory.createFromDB(user);
-
+        console.log("USERS", user);
+        console.log("DELETED POSTID", postid);
         db_user.readingLists = deleteItemFromArray(
           db_user.readingLists,
           postid
         );
+
+        console.log("DB USER", db_user);
+        console.log("NEW READING LISTS", db_user.readingLists);
 
         userAuth.addUserInfo({ ...db_user });
       });
@@ -257,16 +290,16 @@ export const actions = {
           message: "Post Deleted",
         };
 
-        dispatch("notification/addNoti", commit_noti, { root: true }).then(
-          () => {
-            const postsByNotID = getters.getPostByNotID(postid);
-            commit("DELETE_POST", postsByNotID);
-            const postsByID = getters.getPostByID(postid);
-            commit("SET_AUTHOR_POSTS", postsByID);
-            console.log("post deleted");
-            return { postsByNotID, postsByID };
-          }
-        );
+        dispatch("notification/addNoti", commit_noti, { root: true });
+        const postsByNotID = getters.getPostByNotID(postid);
+        commit("DELETE_POST", postsByNotID);
+        const postsByID = getters.getPostByID(postid);
+        commit("SET_AUTHOR_POSTS", postsByID);
+        //*remove post from local store
+        let local_readingLists = getters.getReadingListByNotID(postid);
+        commit("SET_READING_LISTS", local_readingLists);
+        console.log("post deleted");
+        return { postsByNotID, postsByID, local_readingLists };
       });
     });
   },
@@ -328,6 +361,11 @@ export const getters = {
   },
   getPostByNotID: (state) => (id) => {
     return state.posts.filter((post) => {
+      return post.postid !== id;
+    });
+  },
+  getReadingListByNotID: (state) => (id) => {
+    return state.readingLists.filter((post) => {
       return post.postid !== id;
     });
   },

@@ -3,16 +3,18 @@ import "firebase/firestore";
 import "firebase/storage";
 
 export default {
-  fetchAllposts() {
+  fetchAllPosts() {
     return firebase
       .firestore()
       .collection("posts")
+      .limit(5)
       .get();
   },
-  fetchPosts() {
+  fetchTagPosts(tag) {
     return firebase
       .firestore()
       .collection("posts")
+      .where("tags", "array-contains", tag)
       .limit(5)
       .get();
   },

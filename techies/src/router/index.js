@@ -39,6 +39,7 @@ const routes = [
     props: true,
     meta: { requiresAuth: true },
   },
+
   {
     path: "/login",
     name: "login",

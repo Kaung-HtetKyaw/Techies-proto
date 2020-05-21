@@ -108,11 +108,10 @@
 <script>
 import { mapState } from "vuex";
 import { rules } from "@/mixins/rules.js";
+import { editPostUpload } from "@/mixins/uploadImg.js";
 import store from "@/store/index.js";
-import firebase from "firebase/app";
-import "firebase/firestore";
 export default {
-  mixins: [rules],
+  mixins: [rules, editPostUpload],
   props: {
     post: {
       type: Object,
@@ -200,52 +199,6 @@ export default {
       }
     },
 
-    onPickFile() {
-      this.$refs.fileInput.click();
-    },
-    onFilePicked(event) {
-      if (event.target.files[0]) {
-        const file = event.target.files[0];
-        this.rawFile = file;
-        let filename = file.name;
-        if (filename.lastIndexOf(".") <= 0) {
-          return alert("Shit");
-        }
-        const fileReader = new FileReader();
-        fileReader.addEventListener("load", () => {
-          this.local_imageUrl = fileReader.result;
-        });
-        fileReader.readAsDataURL(file);
-        this.upload_btn = true;
-      }
-    },
-    uploadFile() {
-      const filename = this.rawFile;
-      this.upload = true;
-      const key = Math.floor(Math.random() * 199054289);
-      const ext = filename.name.slice(filename.name.lastIndexOf("."));
-
-      const storageRef = firebase
-        .storage()
-        .ref("posts/" + key + ext)
-        .put(filename);
-
-      storageRef.on(
-        "state_changed",
-        function() {},
-        function() {
-          // Handle unsuccessful uploads
-        },
-        () => {
-          storageRef.snapshot.ref.getDownloadURL().then(downloadURL => {
-            this.post.image = downloadURL;
-            this.upload = false;
-            this.upload_btn = false;
-            this.choose_btn = false;
-          });
-        }
-      );
-    },
     toggle() {
       this.$nextTick(() => {
         if (this.likesAllFruit) {

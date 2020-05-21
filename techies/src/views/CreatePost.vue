@@ -10,24 +10,21 @@
               :counter="80"
               :rules="titleRules"
               label="Title"
-              rounded
               required
             ></v-text-field>
             <v-textarea
               label="Overview for your posts"
               v-model="description"
               :rules="textRules"
-              rounded
               auto-grow
               class
             ></v-textarea>
 
-            <div class="mb-6">
+            <div class="my-6">
               <v-btn
                 v-if="!imageUrl"
                 outlined
                 color="info"
-                rounded
                 required
                 @click="onPickFile"
               >Choose a file</v-btn>
@@ -58,7 +55,6 @@
               v-model="content"
               label="Write the details here"
               :rules="textRules"
-              rounded
               auto-grow
               class="p-0"
             ></v-textarea>
@@ -71,7 +67,6 @@
               multiple
               :rules="postCatRules"
               required
-              rounded
             >
               <template v-slot:prepend-item></template>
             </v-select>
@@ -83,7 +78,6 @@
               label="Choose read time"
               :rules="selectRules"
               required
-              rounded
             >
               <template v-slot:prepend-item></template>
             </v-select>
@@ -101,11 +95,10 @@
 <script>
 import { mapState } from "vuex";
 import { rules } from "@/mixins/rules.js";
+import { createPostUpoad } from "@/mixins/uploadImg.js";
 import store from "@/store/index.js";
-import firebase from "firebase/app";
-import "firebase/firestore";
 export default {
-  mixins: [rules],
+  mixins: [rules, createPostUpoad],
 
   data: () => ({
     valid: true,
@@ -167,6 +160,7 @@ export default {
         readTime: this.readTime,
         tags: this.tags
       };
+
       this.$refs.form.validate();
       if (this.valid) {
         this.loading = true;
@@ -185,51 +179,6 @@ export default {
       }
     },
 
-    onPickFile() {
-      this.$refs.fileInput.click();
-    },
-    onFilePicked(event) {
-      if (event.target.files[0]) {
-        const file = event.target.files[0];
-        this.rawFile = file;
-        let filename = file.name;
-        if (filename.lastIndexOf(".") <= 0) {
-          return alert("Shit");
-        }
-        const fileReader = new FileReader();
-        fileReader.addEventListener("load", () => {
-          this.local_imageUrl = fileReader.result;
-        });
-        fileReader.readAsDataURL(file);
-        this.upload_btn = true;
-      }
-    },
-    uploadFile() {
-      const filename = this.rawFile;
-      this.upload = true;
-      const key = Math.floor(Math.random() * 199054289);
-      const ext = filename.name.slice(filename.name.lastIndexOf("."));
-
-      const storageRef = firebase
-        .storage()
-        .ref("posts/" + key + ext)
-        .put(filename);
-
-      storageRef.on(
-        "state_changed",
-        function() {},
-        function() {
-          // Handle unsuccessful uploads
-        },
-        () => {
-          storageRef.snapshot.ref.getDownloadURL().then(downloadURL => {
-            this.imageUrl = downloadURL;
-            this.upload = false;
-            this.upload_btn = false;
-          });
-        }
-      );
-    },
     toggle() {
       this.$nextTick(() => {
         if (this.likesAllFruit) {

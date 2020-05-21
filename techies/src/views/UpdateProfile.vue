@@ -94,13 +94,11 @@
 <script>
 import { mapState } from "vuex";
 import { rules } from "@/mixins/rules.js";
-import firebase from "firebase/app";
-import "firebase/firestore";
-import "firebase/storage";
+import { updateProfileUpload } from "@/mixins/uploadImg.js";
 import store from "@/store/index.js";
 
 export default {
-  mixins: [rules],
+  mixins: [rules, updateProfileUpload],
   data: () => ({
     valid: true,
     tags: null,
@@ -146,66 +144,40 @@ export default {
         this.loading = true;
         store
           .dispatch("user/updateProfile", user)
-          .then(res => {
-            console.log(res);
-            this.loading = false;
-            this.$router.push({ name: "user", params: { id: this.user.uid } });
+          .then(() => {
+            store.dispatch("posts/fetchUserPosts", user.uid).then(users => {
+              console.log("omg fucin god", users);
+              if (users.posts.length > 0) {
+                users.posts.forEach(post => {
+                  console.log("postalfjsalf", post);
+                  post.author = user;
+                  store
+                    .dispatch("posts/updatePost", {
+                      postid: post.postid,
+                      post: post
+                    })
+                    .then(() => {
+                      this.loading = false;
+                      this.$router.push({
+                        name: "user",
+                        params: { id: this.user.uid }
+                      });
+                    });
+                });
+              } else {
+                this.loading = false;
+                this.$router.push({
+                  name: "user",
+                  params: { id: this.user.uid }
+                });
+              }
+            });
           })
           .catch(error => {
             this.loading = false;
             console.log(error);
           });
       }
-    },
-
-    onPickFile() {
-      this.$refs.fileInput.click();
-    },
-    onFilePicked(event) {
-      if (event.target.files[0]) {
-        const file = event.target.files[0];
-        this.rawFile = file;
-        let filename = file.name;
-        if (filename.lastIndexOf(".") <= 0) {
-          return alert("Shit");
-        } else {
-          const fileReader = new FileReader();
-          fileReader.addEventListener("load", () => {
-            this.local_imageUrl = fileReader.result;
-          });
-          fileReader.readAsDataURL(file);
-          this.upload_btn = true;
-        }
-      }
-    },
-    uploadFile() {
-      const filename = this.rawFile;
-      this.upload = true;
-      const key = Math.floor(Math.random() * 199054289);
-      const ext = filename.name.slice(filename.name.lastIndexOf("."));
-
-      const storageRef = firebase
-        .storage()
-        .ref("users/" + key + ext)
-        .put(filename);
-
-      storageRef.on(
-        "state_changed",
-        function() {},
-        function() {
-          // Handle unsuccessful uploads
-        },
-        () => {
-          storageRef.snapshot.ref.getDownloadURL().then(downloadURL => {
-            this.user.photoURL = downloadURL;
-            console.log("this user photourl", this.user);
-            this.upload = false;
-            this.upload_btn = false;
-            this.upload_finish = true;
-            this.choose_btn = false;
-          });
-        }
-      );
     }
   }
 };

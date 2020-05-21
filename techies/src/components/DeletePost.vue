@@ -57,13 +57,19 @@ export default {
   methods: {
     deletePost() {
       this.loading = true;
-      store.dispatch("posts/deletePost", this.postid).then(res => {
-        console.log("response delete", res);
-        this.loading = false;
-        this.dialog = false;
-        this.$router.push({ name: "postsfeed" });
-        console.log("post deleted");
-      });
+
+      store
+        .dispatch("posts/deletePost", this.postid)
+        .then(deletedPostRelatedInformation => {
+          //*update the local user by removing the deleted post from readingLists
+          let user = store.state.user.user;
+          user.readingLists = deletedPostRelatedInformation.local_readingLists;
+          store.dispatch("user/updateLocalUser", user);
+          this.loading = false;
+          this.dialog = false;
+          this.$router.push({ name: "postsfeed" });
+          console.log("post deleted");
+        });
     }
   }
 };
