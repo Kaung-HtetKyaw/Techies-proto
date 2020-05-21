@@ -144,6 +144,7 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAuth && !currentUser) {
     next({ name: "home" });
+    NProgress.done();
   } else {
     console.log("next", currentUser);
     next();

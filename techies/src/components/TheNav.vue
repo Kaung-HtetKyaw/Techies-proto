@@ -118,7 +118,9 @@
             </div>
           </template>
           <template v-if="!!user">
-            <Categories @click="drawer=false" />
+            <router-link :to="{name:'postsfeed'}" class="router-link">
+              <Categories @click="drawer=false" />
+            </router-link>
           </template>
           <!-- Logged out menu -->
           <template v-if="!user">

@@ -17,4 +17,11 @@ export default {
       .doc(postid)
       .get();
   },
+  deleteComment(id) {
+    return firebase
+      .firestore()
+      .collection("comments")
+      .doc(id)
+      .delete();
+  },
 };

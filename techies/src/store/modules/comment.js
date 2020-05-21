@@ -23,6 +23,7 @@ export const mutations = {
   DELETE_COMMENT(state, comments) {
     state.comments = comments;
   },
+  DELETE_COMMENT_DOC() {},
   SET_COMMENT_LIKE(state, comment) {
     const index = getIndex(state.comments.comments, comment);
     state.comments.comments.splice(index, 1, comment);
@@ -85,6 +86,7 @@ export const actions = {
       });
     });
   },
+  //*this delete comment is to remove a comment in comments array of one of comments docs
   deleteComment({ commit, getters, state, dispatch }, id) {
     //*get comment that is not the id
     const commentsByNotID = getters.getCommentByNotID(id);
@@ -103,6 +105,13 @@ export const actions = {
       };
 
       dispatch("notification/addNoti", commit_noti, { root: true });
+    });
+  },
+  //*this is to delete the entire comment doc which includes postid and comments array
+  deleteCommentDoc({ commit }, id) {
+    return commentServices.deleteComment(id).then(() => {
+      commit("DELETE_COMMENT_DOC");
+      console.log("delete comment doc");
     });
   },
   likeComment({ commit, getters, state }, { id, uid }) {

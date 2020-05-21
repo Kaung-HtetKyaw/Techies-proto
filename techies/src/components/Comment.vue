@@ -21,7 +21,7 @@
                       class="router-link"
                     >
                       <v-list-item class="grow px-0">
-                        <v-list-item-avatar size="30" color="grey darken-3">
+                        <v-list-item-avatar tile size="30" color="grey darken-3">
                           <v-img :src="comment.author.photoURL"></v-img>
                         </v-list-item-avatar>
 
