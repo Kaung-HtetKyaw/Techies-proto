@@ -25,7 +25,6 @@ export default {
     setTimeout(() => {
       store.dispatch("notification/deleteNoti", this.noti).then(() => {
         this.snackbar = false;
-        console.log("noti removed");
       });
     }, this.timeout);
   },

@@ -1,6 +1,6 @@
 <template>
   <div class="border-bottom-black">
-    <v-app-bar app dark color="primary lighten-1" elevation="3" hide-on-scroll class="pr-6">
+    <v-app-bar app dark color="primary lighten-1" elevation="3" class="pr-6">
       <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
 
       <router-link :to="{name:'postsfeed'}" class="router-link">
@@ -54,14 +54,7 @@
               <v-list-item-title>Posts feed</v-list-item-title>
             </v-list-item>
           </router-link>
-          <router-link v-if="!!user" to="/404" class="router-link">
-            <v-list-item>
-              <v-list-item-icon>
-                <v-icon>mdi-post-outline</v-icon>
-              </v-list-item-icon>
-              <v-list-item-title>Posts feed</v-list-item-title>
-            </v-list-item>
-          </router-link>
+
           <!-- Logged in menu -->
           <template v-if="!!user">
             <router-link :to="{name:'create'}" class="router-link">

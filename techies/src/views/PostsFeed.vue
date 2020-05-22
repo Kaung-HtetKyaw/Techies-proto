@@ -47,11 +47,10 @@ export default {
   beforeRouteEnter(to, from, next) {
     NProgress.start();
     const tags = store.state.user.user.tags;
-    console.log("tags", tags);
-    store.dispatch("posts/fetchPosts", tags).then(response => {
+
+    store.dispatch("posts/fetchPosts", tags).then(() => {
       store.dispatch("posts/fetchPopularPosts").then(() => {
         NProgress.done();
-        console.log(response);
         next();
       });
     });
@@ -65,9 +64,7 @@ export default {
       filter: state => state.posts.filter
     })
   },
-  created() {
-    console.log("postsfeed posts", this.posts);
-  },
+
   methods: {
     scroll() {
       window.onscroll = () => {

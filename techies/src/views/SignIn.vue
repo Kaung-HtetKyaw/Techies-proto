@@ -70,16 +70,15 @@ export default {
       this.$refs.form.validate();
       if (this.valid) {
         this.loading = true;
-        console.log(login_user);
+
         store
           .dispatch("user/signIn", login_user)
           .then(() => {
             this.loading = false;
             this.$router.push({ name: "postsfeed" });
           })
-          .catch(error => {
+          .catch(() => {
             this.loading = false;
-            console.log(error);
           });
       } else {
         this.loading = false;

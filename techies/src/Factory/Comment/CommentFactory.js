@@ -6,12 +6,11 @@ class CommentFactory {
   }
 
   createFromDB(object) {
-    console.log("createdb", object.data());
     const preparedComment = {
       comments: object.data().comments,
       postid: object.data().postid,
     };
-    console.log("prepared comment", preparedComment);
+
     return new Comment(preparedComment);
   }
 }

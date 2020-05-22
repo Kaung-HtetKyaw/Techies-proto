@@ -13,7 +13,6 @@ export const mutations = {
 
 export const actions = {
   addNoti({ commit }, noti) {
-    console.log("noti added", noti);
     commit("ADD", noti);
   },
   deleteNoti({ commit, getters }, noti) {

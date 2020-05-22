@@ -214,16 +214,14 @@ export default {
       close_on_content_click: true
     };
   },
-  created() {
-    console.log("comment post", this.post);
-  },
+
   computed: {
     ...mapState({
       user: state => state.user.user
     }),
     likedComment() {
       const liked = this.comment.likes.includes(this.user.uid);
-      console.log("did he like the comment", liked);
+
       return liked;
     }
   },
@@ -233,10 +231,9 @@ export default {
         this.loading = true;
         let db_comment = this.comment;
         db_comment.message = this.comment.message;
-        store.dispatch("comment/updateComment", db_comment).then(res => {
+        store.dispatch("comment/updateComment", db_comment).then(() => {
           this.edit = false;
           this.loading = false;
-          console.log("updated comment", res);
         });
       }
     },
@@ -245,7 +242,6 @@ export default {
       store.dispatch("comment/deleteComment", this.comment.id).then(() => {
         this.deleting = false;
         this.deleteDialog = false;
-        console.log("deleted");
       });
     },
     likeOrUnlike() {
@@ -254,17 +250,13 @@ export default {
           id: this.comment.id,
           uid: this.user.uid
         };
-        store.dispatch("comment/likeComment", payload).then(() => {
-          console.log("liked");
-        });
+        store.dispatch("comment/likeComment", payload).then(() => {});
       } else {
         const payload = {
           id: this.comment.id,
           uid: this.user.uid
         };
-        store.dispatch("comment/unlikeComment", payload).then(() => {
-          console.log("unliked");
-        });
+        store.dispatch("comment/unlikeComment", payload).then(() => {});
       }
     }
   }

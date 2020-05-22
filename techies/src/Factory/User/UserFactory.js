@@ -6,7 +6,6 @@ class UserFactory {
   }
 
   createFromDB(object) {
-    console.log("createdb", object.data());
     const preparedPost = {
       email: object.data().email,
       displayName: object.data().displayName,

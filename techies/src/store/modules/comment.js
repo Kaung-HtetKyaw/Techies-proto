@@ -33,9 +33,8 @@ export const actions = {
   fetchComments({ commit }, postid) {
     return commentServices.fetchComments(postid).then((res) => {
       if (res.data()) {
-        console.log("res comm", res.data());
         const factoryComment = CommentFactory.createFromDB(res);
-        console.log("factory comment", factoryComment);
+
         commit("SET_COMMENTS", factoryComment);
         return factoryComment;
       } else {
@@ -51,28 +50,22 @@ export const actions = {
     });
   },
   uploadComment({ commit }, comment) {
-    console.log("up com", comment);
-    console.log("from comp com", comment);
-
     return commentServices
       .uploadComment({ ...comment })
       .then(() => {
-        console.log("res up comm", comment);
         commit("UPLOAD_COMMENT", comment);
         return comment;
       })
       .catch((error) => {
-        console.log("mod err", error);
+        console.log(error);
       });
   },
   updateComment({ commit, getters, state, dispatch }, comment) {
-    console.log("comment", comment);
     const commentObj = state.comments;
     const commentIndex = getters.getCommentIndex(comment.id);
     commentObj.comments.splice(commentIndex, 1, comment);
 
     return commentServices.uploadComment({ ...commentObj }).then(() => {
-      console.log("updated comment", commentObj);
       commit("UPDATE_COMMENT", commentObj);
       const id = uniqueId.uniqueId();
       const commit_noti = {
@@ -95,7 +88,6 @@ export const actions = {
     //*overwirte it
     comments.comments = commentsByNotID;
     return commentServices.uploadComment({ ...comments }).then(() => {
-      console.log("updated comment", comments);
       commit("DELETE_COMMENT", comments);
       const id = uniqueId.uniqueId();
       const commit_noti = {
@@ -111,7 +103,6 @@ export const actions = {
   deleteCommentDoc({ commit }, id) {
     return commentServices.deleteComment(id).then(() => {
       commit("DELETE_COMMENT_DOC");
-      console.log("delete comment doc");
     });
   },
   likeComment({ commit, getters, state }, { id, uid }) {
@@ -123,7 +114,7 @@ export const actions = {
     //*overwirte the old comment
     const index = getIndex(commentObj.comments, comment);
     commentObj.comments.splice(index, 1, comment);
-    console.log("postid", commentObj);
+
     //*update the post in database
     return commentServices.uploadComment({ ...commentObj }).then(() => {
       commit("SET_COMMENT_LIKE", comment);
@@ -140,7 +131,7 @@ export const actions = {
     //*overwirte the old comment
     const index = getIndex(commentObj.comments, comment);
     commentObj.comments.splice(index, 1, comment);
-    console.log("postid", commentObj);
+
     //*update the post in database
     return commentServices.uploadComment({ ...commentObj }).then(() => {
       commit("SET_COMMENT_LIKE", comment);

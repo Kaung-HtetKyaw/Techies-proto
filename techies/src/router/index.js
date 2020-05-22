@@ -89,7 +89,7 @@ const routes = [
       store.dispatch("posts/fetchPost", to.params.id).then((post) => {
         if (post.uid === store.state.user.user.uid) {
           to.params.post = post;
-          console.log("post", post);
+
           next();
         } else {
           next({ name: "postsfeed" });
@@ -146,7 +146,6 @@ router.beforeEach((to, from, next) => {
     next({ name: "home" });
     NProgress.done();
   } else {
-    console.log("next", currentUser);
     next();
   }
 });

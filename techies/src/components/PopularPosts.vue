@@ -128,8 +128,6 @@ export default {
         : (post.description = formatted_desp);
     });
     //*format description
-
-    console.log("posts", this.posts);
   },
   computed: {
     mostPopularPost() {

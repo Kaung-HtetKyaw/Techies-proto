@@ -15,7 +15,6 @@ export default {
       .firestore()
       .collection("posts")
       .where("tags", "array-contains", tag)
-      .limit(5)
       .get();
   },
   fetchMorePosts(lastVisisble) {

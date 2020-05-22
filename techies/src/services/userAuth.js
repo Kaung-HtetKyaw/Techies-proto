@@ -10,7 +10,7 @@ export default {
   },
   signInWithGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
-    return firebase.auth().signInWithPopup(provider);
+    return firebase.auth().signInWithRedirect(provider);
   },
   signUp(user) {
     return firebase

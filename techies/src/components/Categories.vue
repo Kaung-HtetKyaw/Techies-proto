@@ -115,7 +115,6 @@ export default {
           ? (this.noPostDialog = false)
           : (this.noPostDialog = true);
         this.dialog = false;
-        console.log("cat posts", posts);
       });
     },
     fetchAllPosts() {
@@ -126,7 +125,6 @@ export default {
           ? (this.noPostDialog = false)
           : (this.noPostDialog = true);
         this.dialog = false;
-        console.log("cat posts", posts);
       });
     }
   }

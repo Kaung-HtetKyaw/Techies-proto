@@ -177,7 +177,7 @@ export const actions = {
         const factoryPost = PostFactory.createFromDB(post);
         posts.push(factoryPost);
       });
-      console.log("set author profile", posts);
+
       commit("SET_AUTHOR_POSTS", posts);
       return { posts };
     });
@@ -205,7 +205,6 @@ export const actions = {
       //*if this post which has this postid is already in local store
       //*push it to the empty array
       if (getPostByID) {
-        console.log("one reading lists getters", getPostByID);
         readingLists.push(getPostByID);
       }
       //*if dont find the post by this postid
@@ -294,24 +293,19 @@ export const actions = {
   },
 
   deletePost({ commit, getters, dispatch }, postid) {
-    console.log("DELETING POSTS THAT ARE IN READING LISTS");
-
     //*retrive users who have added this postid in their readinglists
     return userAuth.getUserByReadingList(postid).then((users) => {
       //*delete post from users reading list which is equal to this postid
       users.docs.forEach((user) => {
         //*format the user with User Factory
         let db_user = UserFactory.createFromDB(user);
-        console.log("USERS", user);
-        console.log("DELETED POSTID", postid);
+
         //*overwrite the existing reading list with reading list which dont have this postid
         db_user.readingLists = deleteItemFromArray(
           db_user.readingLists,
           postid
         );
 
-        console.log("DB USER", db_user);
-        console.log("NEW READING LISTS", db_user.readingLists);
         //*update this user  in the database
         userAuth.addUserInfo({ ...db_user });
       });

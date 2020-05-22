@@ -61,7 +61,6 @@ export default {
       store
         .dispatch("posts/deletePost", this.postid)
         .then(deletedPostRelatedInformation => {
-          console.log("DELETED INFORMATION", deletedPostRelatedInformation);
           //*update the local user by removing the deleted post from readingLists
           let user = store.state.user.user;
           user.readingLists = deletedPostRelatedInformation.local_readingLists;
@@ -69,7 +68,6 @@ export default {
           this.loading = false;
           this.dialog = false;
           this.$router.push({ name: "postsfeed" });
-          console.log("post deleted");
         });
     }
   }

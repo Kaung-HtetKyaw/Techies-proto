@@ -48,7 +48,7 @@
           </v-container>
         </v-col>
       </v-row>
-      <v-row dense class="my-12 px-4" v-if="posts.length>0">
+      <v-row dense class="my-12 px-4 mx-0" v-if="posts.length>0">
         <v-col cols="12" sm="12" md="8" offset-md="2">
           <h1 class="headline font-weight-medium text-center">Posts by {{author.displayName}}</h1>
           <v-divider class="my-4"></v-divider>
@@ -98,10 +98,8 @@ import { mapState } from "vuex";
 
 import store from "@/store/index.js";
 function fetchInfo(to, next) {
-  console.log("user id", to.params.id);
   store.dispatch("user/fetchUser", to.params.id).then(user => {
     store.dispatch("posts/fetchUserPosts", user.uid).then(res => {
-      console.log("res", res);
       to.params.author = user;
       to.params.posts = res.posts;
       next();
@@ -133,11 +131,7 @@ export default {
   components: {
     PostCard
   },
-  created() {
-    console.log("author", this.author);
-    console.log("posts", this.posts);
-    console.log("id", this.id);
-  },
+
   computed: {
     ...mapState({
       user: state => state.user.user

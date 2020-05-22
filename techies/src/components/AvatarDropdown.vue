@@ -94,7 +94,6 @@ export default {
   }),
   computed: {
     trimTime() {
-      console.log("date", this.user.joined);
       return this.user.joined
         .split(" ")
         .slice(1, 4)

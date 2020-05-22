@@ -27,8 +27,7 @@
                 color="info"
                 required
                 @click="onPickFile"
-                >Choose a file</v-btn
-              >
+              >Choose a file</v-btn>
               <input
                 type="file"
                 class="d-none"
@@ -36,12 +35,7 @@
                 accept="image/*"
                 @change="onFilePicked"
               />
-              <v-img
-                v-if="local_imageUrl"
-                :src="local_imageUrl"
-                width="300px"
-                class="my-4"
-              ></v-img>
+              <v-img v-if="local_imageUrl" :src="local_imageUrl" width="300px" class="my-4"></v-img>
               <div class="my-4" v-if="upload_btn">
                 <v-btn
                   outlined
@@ -58,11 +52,7 @@
               </div>
             </div>
             <div>
-              <vue-editor
-                required
-                v-model="content"
-                :editorToolbar="customToolbar"
-              ></vue-editor>
+              <vue-editor required v-model="content" :editorToolbar="customToolbar"></vue-editor>
             </div>
             <v-select
               v-model="tags"
@@ -91,12 +81,12 @@
             <div class="d-flex justify-center align-center">
               <v-btn
                 outlined
+                :loading="loading"
                 :disabled="!valid"
                 color="info"
                 @click="create"
                 rounded
-                >Validate</v-btn
-              >
+              >Validate</v-btn>
             </div>
           </v-form>
         </v-col>
@@ -115,7 +105,7 @@ import { VueEditor } from "vue2-editor";
 export default {
   mixins: [rules, createPostUpoad, sanitizeCreatePost],
   components: {
-    "vue-editor": VueEditor,
+    "vue-editor": VueEditor
   },
   data: () => ({
     valid: true,
@@ -124,7 +114,7 @@ export default {
     description: "",
     content: "",
     select: null,
-
+    loading: false,
     tags: null,
     checkbox: false,
     rawFile: null,
@@ -132,13 +122,13 @@ export default {
     imageUrl: null,
     readTime: null,
     upload: false,
-    upload_btn: false,
+    upload_btn: false
   }),
   mounted() {},
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
-      categories: (state) => state.user.categories,
+      user: state => state.user.user,
+      categories: state => state.user.categories
     }),
     createReadTime() {
       let readTime = [];
@@ -159,9 +149,9 @@ export default {
       return new Date().toLocaleString(["en-US"], {
         month: "short",
         day: "2-digit",
-        year: "numeric",
+        year: "numeric"
       });
-    },
+    }
   },
   methods: {
     create() {
@@ -176,23 +166,21 @@ export default {
         likes: [],
         likesNo: 0,
         readTime: this.readTime,
-        tags: this.tags,
+        tags: this.tags
       };
 
       this.$refs.form.validate();
-      if (this.valid) {
+      if (this.valid && this.content !== "") {
         this.loading = true;
 
         store
           .dispatch("posts/createPost", post)
-          .then((res) => {
-            console.log(res);
+          .then(res => {
             this.loading = false;
             this.$router.push({ name: "postshow", params: { id: res.postid } });
           })
-          .catch((error) => {
+          .catch(() => {
             this.loading = false;
-            console.log(error);
           });
       }
     },
@@ -205,7 +193,7 @@ export default {
           this.selectedFruits = this.fruits.slice();
         }
       });
-    },
-  },
+    }
+  }
 };
 </script>

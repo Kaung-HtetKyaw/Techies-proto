@@ -1,12 +1,12 @@
 <template>
   <div class="my-6">
-    <v-container>
+    <v-container class="overflow-hidden">
       <v-row dense>
         <v-col cols="12" sm="12" md="8" offset-md="2">
           <v-container>
             <v-row dense>
               <v-col cols="12" sm="12">
-                <v-img :src="post.image" :alt="post.title"></v-img>
+                <v-img v-if="!!post.image" :src="post.image" :alt="post.title"></v-img>
               </v-col>
             </v-row>
             <v-row dense class="my-4">
@@ -16,13 +16,7 @@
                   v-for="tag in post.tags"
                   :key="tag"
                 >
-                  <v-chip
-                    class="ma-2"
-                    outlined
-                    :input-value="active"
-                    @click="toggle"
-                    >#{{ tag }}</v-chip
-                  >
+                  <v-chip class="ma-2" outlined :input-value="active" @click="toggle">#{{ tag }}</v-chip>
                 </v-slide-item>
               </v-slide-group>
             </v-row>
@@ -32,10 +26,7 @@
               </v-col>
             </v-row>
             <v-row dense class="my-4">
-              <router-link
-                :to="{ name: 'user', params: { id: post.uid } }"
-                class="router-link"
-              >
+              <router-link :to="{ name: 'user', params: { id: post.uid } }" class="router-link">
                 <v-col
                   cols="12"
                   sm="12"
@@ -52,15 +43,12 @@
                         <v-list-item-content>
                           <v-list-item-title
                             class="subtitle-1 font-weight-medium"
-                            >{{ post.author.displayName }}</v-list-item-title
-                          >
+                          >{{ post.author.displayName }}</v-list-item-title>
                           <v-list-item-title>
                             <div class="opacity7">
                               <span class="body-2">{{ post.date }}</span>
                               <span class="mx-1">|</span>
-                              <span class="body-2"
-                                >{{ post.readTime }} read</span
-                              >
+                              <span class="body-2">{{ post.readTime }} read</span>
                             </div>
                           </v-list-item-title>
                         </v-list-item-content>
@@ -81,9 +69,11 @@
                     <v-icon v-if="likedPost">mdi-heart</v-icon>
                     <v-icon v-else>mdi-heart-outline</v-icon>
                   </v-btn>
-                  <span class="subheading mr-2" v-if="post.likes.length > 0">{{
+                  <span class="subheading mr-2" v-if="post.likes.length > 0">
+                    {{
                     post.likes.length
-                  }}</span>
+                    }}
+                  </span>
                 </div>
 
                 <div>
@@ -106,20 +96,17 @@
         <v-col cols="12" sm="12" md="8" offset-md="2">
           <v-container>
             <v-row dense class="d-flex flex-column align-center justify-center">
-              <v-col
-                cols="12"
-                sm="12"
-                md="12"
-                class="d-flex justify-center align-center"
-              >
+              <v-col cols="12" sm="12" md="12" class="d-flex justify-center align-center">
                 <div>
                   <v-btn x-large icon color="pink" @click="likeOrUnlikePost">
                     <v-icon v-if="likedPost">mdi-heart</v-icon>
                     <v-icon v-else>mdi-heart-outline</v-icon>
                   </v-btn>
-                  <span class="subheading mr-2" v-if="post.likes.length > 0">{{
+                  <span class="subheading mr-2" v-if="post.likes.length > 0">
+                    {{
                     post.likes.length
-                  }}</span>
+                    }}
+                  </span>
                 </div>
                 <div>
                   <v-btn x-large icon color="info" @click="addOrRemoveBookMark">
@@ -147,71 +134,67 @@ import { mapState } from "vuex";
 import CommentContainer from "@/components/CommentContainer.vue";
 export default {
   components: {
-    CommentContainer,
+    CommentContainer
   },
   props: {
     post: {
       type: Object,
-      required: true,
+      required: true
     },
     id: {
       type: String,
-      required: true,
-    },
+      required: true
+    }
   },
   methods: {
     addOrRemoveBookMark() {
       if (!this.addedToReadingList) {
-        store.dispatch("user/addToBookMark", this.post.postid).then(() => {
-          console.log("added to reading list");
-        });
+        store.dispatch("user/addToBookMark", this.post.postid).then(() => {});
       } else {
-        store.dispatch("user/removeFromBookMark", this.post.postid).then(() => {
-          console.log("added to reading list");
-        });
+        store
+          .dispatch("user/removeFromBookMark", this.post.postid)
+          .then(() => {});
       }
     },
     likeOrUnlikePost() {
-      console.log("did he like the post", this.likedPost);
       if (!this.likedPost) {
         const payload = {
           postid: this.post.postid,
-          uid: this.user.uid,
+          uid: this.user.uid
         };
-        store.dispatch("posts/likePost", payload).then(() => {
-          console.log("liked");
-        });
+        store.dispatch("posts/likePost", payload).then(() => {});
       } else {
         const payload = {
           postid: this.post.postid,
-          uid: this.user.uid,
+          uid: this.user.uid
         };
-        store.dispatch("posts/unlikePost", payload).then(() => {
-          console.log("unliked");
-        });
+        store.dispatch("posts/unlikePost", payload).then(() => {});
       }
-    },
+    }
   },
   computed: {
     ...mapState({
-      user: (state) => state.user.user,
+      user: state => state.user.user
     }),
 
     addedToReadingList() {
       const added = this.user.readingLists.includes(this.post.postid);
-      console.log("added", added);
+
       return added;
     },
     likedPost() {
       const liked = this.post.likes.includes(this.user.uid);
-      console.log("did he like the post");
+
       return liked;
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style scoped>
+.overflow-hidden {
+  overflow: hidden;
+}
 .opacity7 {
   opacity: 0.7;
 }

@@ -19,7 +19,7 @@
               </router-link>
             </v-col>
             <v-col cols="12" sm="12" md="3" class="d-flex justify-center align-center my-1">
-              <v-img contain :src="post.image"></v-img>
+              <v-img contain v-if="!!post.image" :src="post.image" :alt="post.title"></v-img>
             </v-col>
           </v-row>
         </v-container>
@@ -111,39 +111,30 @@ export default {
       required: true
     }
   },
-  created() {
-    console.log("post", this.post);
-  },
+
   methods: {
     addOrRemoveBookMark() {
       if (!this.addedToReadingList) {
-        store.dispatch("user/addToBookMark", this.post.postid).then(() => {
-          console.log("added to reading list");
-        });
+        store.dispatch("user/addToBookMark", this.post.postid).then(() => {});
       } else {
-        store.dispatch("user/removeFromBookMark", this.post.postid).then(() => {
-          console.log("added to reading list");
-        });
+        store
+          .dispatch("user/removeFromBookMark", this.post.postid)
+          .then(() => {});
       }
     },
     likeOrUnlikePost() {
-      console.log("did he like the post", this.likedPost);
       if (!this.likedPost) {
         const payload = {
           postid: this.post.postid,
           uid: this.user.uid
         };
-        store.dispatch("posts/likePost", payload).then(() => {
-          console.log("liked");
-        });
+        store.dispatch("posts/likePost", payload).then(() => {});
       } else {
         const payload = {
           postid: this.post.postid,
           uid: this.user.uid
         };
-        store.dispatch("posts/unlikePost", payload).then(() => {
-          console.log("unliked");
-        });
+        store.dispatch("posts/unlikePost", payload).then(() => {});
       }
     }
   },
@@ -161,12 +152,12 @@ export default {
     },
     addedToReadingList() {
       const added = this.user.readingLists.includes(this.post.postid);
-      console.log("added", added);
+
       return added;
     },
     likedPost() {
       const liked = this.post.likes.includes(this.user.uid);
-      console.log("did he like the post");
+
       return liked;
     }
   }

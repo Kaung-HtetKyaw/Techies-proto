@@ -66,9 +66,7 @@ export const mutations = {
 };
 export const actions = {
   checkInitialUser({ commit, dispatch }, user) {
-    console.log("current user check", user);
     return userServices.fetchUser(user.uid).then((res) => {
-      console.log("return user check", res.data());
       //*add new user property
 
       const commit_user = {
@@ -90,7 +88,6 @@ export const actions = {
   },
   fetchUser({ commit }, id) {
     return userServices.fetchUser(id).then((res) => {
-      console.log("fetch user", res.data());
       const commit_user = {
         uid: res.id,
         ...UserFactory.createFromDB(res),
@@ -137,7 +134,6 @@ export const actions = {
   signInWithGoogle({ commit, dispatch }) {
     //*sign in with google
     return userServices.signInWithGoogle().then((sign_res) => {
-      console.log("new user", sign_res);
       const isNewUser = sign_res.additionalUserInfo.isNewUser;
       //*fetch the user with uid got from google sign in
       return userServices.fetchUser(sign_res.user.uid).then((user_res) => {
@@ -169,8 +165,7 @@ export const actions = {
           sign_res.user.isNewUser = isNewUser;
           //*format the user with Factory pattern
           const user = UserFactory.create(sign_res.user);
-          console.log("response user", sign_res.user);
-          console.log("user sign in info", user);
+
           return userServices.addUserInfo({ ...user }).then(() => {
             //*Noti
             const id = uniqueId.uniqueId();
@@ -196,7 +191,7 @@ export const actions = {
   },
   updateProfile({ commit, dispatch }, user) {
     //* format user obj to commit obj for excluding password
-    console.log("state edit user", user);
+
     return userServices.addUserInfo(user).then(() => {
       const id = uniqueId.uniqueId();
       const commit_noti = {
@@ -231,7 +226,6 @@ export const actions = {
 
     //*update the post in database
     return userServices.addUserInfo({ ...user }).then(() => {
-      console.log("user reading lists changed", user);
       commit("SET_READING_LIST", user.readingLists);
     });
   },
@@ -243,7 +237,6 @@ export const actions = {
     user.readingLists = readingList;
     //*update the user in database
     return userServices.addUserInfo({ ...user }).then(() => {
-      console.log("user reading lists changed", user);
       commit("SET_READING_LIST", user.readingLists);
     });
   },

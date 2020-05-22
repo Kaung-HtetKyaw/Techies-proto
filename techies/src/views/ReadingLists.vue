@@ -56,9 +56,7 @@ export default {
   components: {
     PostCard
   },
-  created() {
-    console.log("reading list", this.us);
-  },
+
   computed: {
     ...mapState({
       readingLists: state => state.posts.readingLists

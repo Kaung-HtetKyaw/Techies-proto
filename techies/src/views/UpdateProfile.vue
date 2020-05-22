@@ -126,7 +126,7 @@ export default {
   methods: {
     validate() {
       this.$refs.form.validate();
-      console.log("user obj", this.user);
+
       const user = {
         email: this.user.email,
         displayName: this.user.displayName,
@@ -138,7 +138,6 @@ export default {
         readingLists: this.user.readingLists,
         isNewUser: false
       };
-      console.log("eidted user", user);
 
       if (this.valid) {
         this.loading = true;
@@ -146,10 +145,8 @@ export default {
           .dispatch("user/updateProfile", user)
           .then(() => {
             store.dispatch("posts/fetchUserPosts", user.uid).then(users => {
-              console.log("omg fucin god", users);
               if (users.posts.length > 0) {
                 users.posts.forEach(post => {
-                  console.log("postalfjsalf", post);
                   post.author = user;
                   store
                     .dispatch("posts/updatePost", {
@@ -173,9 +170,8 @@ export default {
               }
             });
           })
-          .catch(error => {
+          .catch(() => {
             this.loading = false;
-            console.log(error);
           });
       }
     }

@@ -109,9 +109,7 @@ export default {
       comments: state => state.comment.comments.comments
     })
   },
-  created() {
-    console.log("state com in comp", this.comments);
-  },
+
   methods: {
     uploadComment() {
       this.$refs.form.validate();
@@ -143,19 +141,13 @@ export default {
 
         store
           .dispatch("comment/uploadComment", db_comment_obj)
-          .then(res => {
+          .then(() => {
             this.valid = true;
             this.user_comment = " ";
 
             this.loading = false;
-            this.comments.forEach(el => {
-              console.log("shittt", el);
-            });
-
-            console.log("res upload", res);
           })
-          .catch(err => {
-            console.log(err);
+          .catch(() => {
             this.loading = false;
           });
       }
@@ -165,7 +157,7 @@ export default {
       store.dispatch("comment/fetchComments", this.postid).then(res => {
         this.fetch = true;
         this.loading = false;
-        console.log("has comments", res);
+
         if (res) {
           this.has_comment = true;
         }

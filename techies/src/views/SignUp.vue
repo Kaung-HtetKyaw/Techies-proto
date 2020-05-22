@@ -147,14 +147,12 @@ export default {
         this.loading = true;
         store
           .dispatch("user/signUp", user)
-          .then(res => {
-            console.log(res);
+          .then(() => {
             this.loading = false;
             this.$router.push({ name: "postsfeed" });
           })
-          .catch(error => {
+          .catch(() => {
             this.loading = false;
-            console.log(error);
           });
       }
     },
