@@ -10,6 +10,6 @@ export default class User {
       (this.photoURL = object.photoURL),
       (this.uid = object.uid);
     this.readingLists = object.readingLists ? object.readingLists : [];
-    this.isNewUser = object.isNewUser;
+    this.isNewUser = object.isNewUser ? false : true;
   }
 }

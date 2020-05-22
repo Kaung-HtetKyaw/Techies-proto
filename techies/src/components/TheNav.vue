@@ -1,5 +1,5 @@
 <template>
-  <div class="border-bottom-black">
+  <div>
     <v-app-bar app dark color="primary lighten-1" elevation="3" class="pr-6">
       <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
 
@@ -102,10 +102,7 @@
                   <v-list-item-icon>
                     <v-icon>mdi-card-text-outline</v-icon>
                   </v-list-item-icon>
-                  <v-list-item-title>
-                    Update Profile
-                    <v-icon color="error" v-if="user.isNewUser">mdi-exclamation-thick</v-icon>
-                  </v-list-item-title>
+                  <v-list-item-title>Update Profile</v-list-item-title>
                 </v-list-item>
               </router-link>
             </div>

@@ -17,7 +17,7 @@ class UserFactory {
       readingLists: object.data().readingLists
         ? object.data().readingLists
         : [],
-      isNewUser: object.data().isNewUser,
+      isNewUser: object.data().isNewUser ? false : true,
     };
     return new User(preparedPost);
   }

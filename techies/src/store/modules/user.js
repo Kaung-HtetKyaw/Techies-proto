@@ -69,21 +69,44 @@ export const actions = {
     return userServices.fetchUser(user.uid).then((res) => {
       //*add new user property
 
-      const commit_user = {
-        ...UserFactory.createFromDB(res),
-      };
+      if (res.data()) {
+        const commit_user = {
+          ...UserFactory.create(res.data()),
+        };
 
-      const id = uniqueId.uniqueId();
-      const commit_noti = {
-        type: "success",
-        id: id,
-        message: `Signed in as ${commit_user.displayName}`,
-      };
+        const id = uniqueId.uniqueId();
+        const commit_noti = {
+          type: "success",
+          id: id,
+          message: `Signed in as ${commit_user.displayName}`,
+        };
 
-      dispatch("notification/addNoti", commit_noti, { root: true }).then(() => {
-        commit("CHECK_INITIAL_USER_STATE", commit_user);
-        return commit_user;
-      });
+        dispatch("notification/addNoti", commit_noti, { root: true }).then(
+          () => {
+            commit("CHECK_INITIAL_USER_STATE", commit_user);
+            return commit_user;
+          }
+        );
+      } else {
+        const commit_user = {
+          ...UserFactory.create(user),
+        };
+        return userServices.addUserInfo(commit_user).then(() => {
+          const id = uniqueId.uniqueId();
+          const commit_noti = {
+            type: "success",
+            id: id,
+            message: `Signed in as ${commit_user.displayName}`,
+          };
+
+          dispatch("notification/addNoti", commit_noti, { root: true }).then(
+            () => {
+              commit("CHECK_INITIAL_USER_STATE", commit_user);
+              return commit_user;
+            }
+          );
+        });
+      }
     });
   },
   fetchUser({ commit }, id) {
@@ -149,7 +172,7 @@ export const actions = {
           const commit_noti = {
             type: "success",
             id: id,
-            message: `Account Created`,
+            message: `Signed in as ${user.displayName}`,
           };
 
           commit("SIGN_UP", user);

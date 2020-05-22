@@ -18,7 +18,6 @@ export default {
       .get();
   },
   fetchMorePosts(lastVisisble) {
-    console.log("enter");
     if (lastVisisble) {
       return firebase
         .firestore()
