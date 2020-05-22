@@ -27,7 +27,8 @@
                 color="info"
                 required
                 @click="onPickFile"
-              >Choose a file</v-btn>
+                >Choose a file</v-btn
+              >
               <input
                 type="file"
                 class="d-none"
@@ -35,7 +36,12 @@
                 accept="image/*"
                 @change="onFilePicked"
               />
-              <v-img v-if="local_imageUrl" :src="local_imageUrl" width="300px" class="my-4"></v-img>
+              <v-img
+                v-if="local_imageUrl"
+                :src="local_imageUrl"
+                width="300px"
+                class="my-4"
+              ></v-img>
               <div class="my-4" v-if="upload_btn">
                 <v-btn
                   outlined
@@ -51,13 +57,13 @@
                 </v-btn>
               </div>
             </div>
-            <v-textarea
-              v-model="content"
-              label="Write the details here"
-              :rules="textRules"
-              auto-grow
-              class="p-0"
-            ></v-textarea>
+            <div>
+              <vue-editor
+                required
+                v-model="content"
+                :editorToolbar="customToolbar"
+              ></vue-editor>
+            </div>
             <v-select
               v-model="tags"
               :items="categories"
@@ -83,7 +89,14 @@
             </v-select>
 
             <div class="d-flex justify-center align-center">
-              <v-btn outlined :disabled="!valid" color="info" @click="create" rounded>Validate</v-btn>
+              <v-btn
+                outlined
+                :disabled="!valid"
+                color="info"
+                @click="create"
+                rounded
+                >Validate</v-btn
+              >
             </div>
           </v-form>
         </v-col>
@@ -96,10 +109,14 @@
 import { mapState } from "vuex";
 import { rules } from "@/mixins/rules.js";
 import { createPostUpoad } from "@/mixins/uploadImg.js";
+import { sanitizeCreatePost } from "@/mixins/contentSanitize.js";
 import store from "@/store/index.js";
+import { VueEditor } from "vue2-editor";
 export default {
-  mixins: [rules, createPostUpoad],
-
+  mixins: [rules, createPostUpoad, sanitizeCreatePost],
+  components: {
+    "vue-editor": VueEditor,
+  },
   data: () => ({
     valid: true,
     title: "",
@@ -115,12 +132,13 @@ export default {
     imageUrl: null,
     readTime: null,
     upload: false,
-    upload_btn: false
+    upload_btn: false,
   }),
+  mounted() {},
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      categories: state => state.user.categories
+      user: (state) => state.user.user,
+      categories: (state) => state.user.categories,
     }),
     createReadTime() {
       let readTime = [];
@@ -141,9 +159,9 @@ export default {
       return new Date().toLocaleString(["en-US"], {
         month: "short",
         day: "2-digit",
-        year: "numeric"
+        year: "numeric",
       });
-    }
+    },
   },
   methods: {
     create() {
@@ -158,7 +176,7 @@ export default {
         likes: [],
         likesNo: 0,
         readTime: this.readTime,
-        tags: this.tags
+        tags: this.tags,
       };
 
       this.$refs.form.validate();
@@ -167,12 +185,12 @@ export default {
 
         store
           .dispatch("posts/createPost", post)
-          .then(res => {
+          .then((res) => {
             console.log(res);
             this.loading = false;
             this.$router.push({ name: "postshow", params: { id: res.postid } });
           })
-          .catch(error => {
+          .catch((error) => {
             this.loading = false;
             console.log(error);
           });
@@ -187,7 +205,7 @@ export default {
           this.selectedFruits = this.fruits.slice();
         }
       });
-    }
-  }
+    },
+  },
 };
 </script>
