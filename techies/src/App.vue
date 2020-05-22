@@ -26,7 +26,7 @@ export default {
   components: {
     TheNav,
     Footer,
-    NotiContainer
+    NotiContainer,
   },
 
   data: () => ({
@@ -45,17 +45,18 @@ export default {
           displayName: currentUser.displayName,
           photoURL: currentUser.photoURL,
           uid: currentUser.uid,
-          joined: currentUser.metadata.creationTime
+          joined: currentUser.metadata.creationTime,
         })
-        .then(res => {
+        .then((res) => {
           console.log("initial user", res);
           this.$router.push({ name: "postsfeed" });
         });
     }
-  }
+  },
 };
 </script>
-<style >
+<style>
+@import "style/WYSIWYG.css";
 .router-link {
   text-decoration: none;
   color: initial;

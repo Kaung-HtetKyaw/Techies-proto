@@ -30,7 +30,8 @@
                 rounded
                 required
                 @click="onPickFile"
-              >Choose a file</v-btn>
+                >Choose a file</v-btn
+              >
               <input
                 type="file"
                 class="d-none"
@@ -38,7 +39,12 @@
                 accept="image/*"
                 @change="onFilePicked"
               />
-              <v-img v-if="getImageUrl" :src="getImageUrl" width="300px" class="my-4"></v-img>
+              <v-img
+                v-if="getImageUrl"
+                :src="getImageUrl"
+                width="300px"
+                class="my-4"
+              ></v-img>
               <div class="my-4" v-if="upload_btn">
                 <v-btn
                   outlined
@@ -54,14 +60,13 @@
                 </v-btn>
               </div>
             </div>
-            <v-textarea
-              v-model="post.content"
-              label="Write the details here"
-              :rules="textRules"
-              rounded
-              auto-grow
-              class="p-0"
-            ></v-textarea>
+            <div>
+              <vue-editor
+                required
+                v-model="post.content"
+                :editorToolbar="customToolbar"
+              ></vue-editor>
+            </div>
             <v-select
               v-model="post.tags"
               :items="categories"
@@ -96,7 +101,8 @@
                 color="info"
                 @click="update"
                 rounded
-              >Update</v-btn>
+                >Update</v-btn
+              >
             </div>
           </v-form>
         </v-col>
@@ -109,14 +115,19 @@
 import { mapState } from "vuex";
 import { rules } from "@/mixins/rules.js";
 import { editPostUpload } from "@/mixins/uploadImg.js";
+import { sanitizeEditPost } from "@/mixins/contentSanitize.js";
+import { VueEditor } from "vue2-editor";
 import store from "@/store/index.js";
 export default {
-  mixins: [rules, editPostUpload],
+  mixins: [rules, editPostUpload, sanitizeEditPost],
+  components: {
+    "vue-editor": VueEditor,
+  },
   props: {
     post: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   data: () => ({
     valid: true,
@@ -126,12 +137,12 @@ export default {
     upload: false,
     upload_btn: false,
     choose_btn: true,
-    loading: false
+    loading: false,
   }),
   computed: {
     ...mapState({
-      user: state => state.user.user,
-      categories: state => state.user.categories
+      user: (state) => state.user.user,
+      categories: (state) => state.user.categories,
     }),
     getImageUrl() {
       return this.local_imageUrl ? this.local_imageUrl : this.post.image;
@@ -155,9 +166,9 @@ export default {
       return new Date().toLocaleString(["en-US"], {
         month: "short",
         day: "2-digit",
-        year: "numeric"
+        year: "numeric",
       });
-    }
+    },
   },
   methods: {
     update() {
@@ -175,7 +186,7 @@ export default {
         likes: this.post.likes,
         likesNo: this.post.likesNo,
         readTime: this.post.readTime,
-        tags: this.post.tags
+        tags: this.post.tags,
       };
       console.log("s post", post);
       this.$refs.form.validate();
@@ -185,14 +196,14 @@ export default {
         store
           .dispatch("posts/updatePost", {
             postid: this.post.postid,
-            post: post
+            post: post,
           })
-          .then(res => {
+          .then((res) => {
             console.log(res);
             this.loading = false;
             this.$router.push({ name: "postshow", params: { id: res.postid } });
           })
-          .catch(error => {
+          .catch((error) => {
             this.loading = false;
             console.log(error);
           });
@@ -207,7 +218,7 @@ export default {
           this.selectedFruits = this.fruits.slice();
         }
       });
-    }
-  }
+    },
+  },
 };
 </script>
