@@ -37,7 +37,7 @@ export default {
     const currentUser = userServices.currentUser();
     //* if currentUser available
     //*commit is to the local store and redirect route
-    console.log("WOOWOWOOOOOO", currentUser);
+
     if (currentUser) {
       store
         .dispatch("user/checkInitialUser", {
@@ -48,7 +48,7 @@ export default {
           joined: currentUser.metadata.creationTime,
         })
         .then((res) => {
-          console.log("initial user", res);
+         
           this.$router.push({ name: "postsfeed" });
         });
     }
